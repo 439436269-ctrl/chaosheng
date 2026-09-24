@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2B3B93">
+<title>超盛纺配 · 必佳诺 PICANOL 喷气织机配件</title>
+<style>
+:root{
+  --blue-deep:#2B3B93;
+  --blue:#049FE6;
+  --blue-mid:#1F5BB5;
+  --blue-soft:#E8F1FC;
+  --ink:#1A1A1A;
+  --sub:#5A6478;
+  --mute:#8A93A6;
+  --orange:#C87A00;
+  --orange-soft:#FFF4E0;
+  --green:#7CB07C;
+  --green-line:#7CB07C;
+  --green-soft:#F3F8F3;
+  --paper:#FFFFFF;
+  --bg:#F4F6F7;
+  --card:#FFFFFF;
+  --line:#EEEEEE;
+  --border:#E4E8F0;
+  --badge:#3D3D9E;
+  --shadow:0 4px 20px rgba(20,40,120,.06);
+  --shadow-hover:0 12px 32px rgba(20,40,120,.12);
+  --radius:14px;
+  --nav-h:64px;
+  --max:1120px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'PingFang SC','Microsoft YaHei','Segoe UI',sans-serif;
+  background:var(--bg);color:var(--ink);
+  line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+.container{width:min(var(--max),calc(100% - 40px));margin-inline:auto}
+
+/* ===== Nav（参考站顶栏节奏） ===== */
+.nav{
+  position:sticky;top:0;z-index:100;height:var(--nav-h);
+  background:linear-gradient(90deg,var(--blue-deep) 0%,var(--blue-mid) 42%,var(--blue) 100%);
+  box-shadow:0 2px 16px rgba(20,40,120,.2);
+}
+.nav-inner{
+  height:100%;display:flex;align-items:center;justify-content:space-between;
+  width:min(1200px,calc(100% - 32px));margin-inline:auto;gap:16px;
+}
+.brand{display:flex;align-items:center;gap:10px;color:#fff;min-width:0}
+.brand img{
+  width:36px;height:36px;border-radius:50%;background:#fff;padding:2px;
+  border:2px solid rgba(255,255,255,.45);flex:none;
+}
+.brand .t{display:flex;flex-direction:column;line-height:1.15}
+.brand .t b{font-size:16px;letter-spacing:.12em;font-weight:700}
+.brand .t span{font-size:10px;letter-spacing:.18em;opacity:.85}
+.nav-links{display:flex;align-items:center;gap:4px}
+.nav-links a{
+  color:rgba(255,255,255,.92);font-size:13.5px;padding:8px 14px;border-radius:8px;
+  transition:background .15s,letter-spacing .15s;
+}
+.nav-links a:hover{background:rgba(255,255,255,.14);letter-spacing:.04em}
+.nav-cta{
+  margin-left:8px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;
+  background:#fff;color:var(--blue-deep);transition:transform .15s,box-shadow .15s;
+  white-space:nowrap;
+}
+.nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
+.nav-toggle{display:none;width:40px;height:40px;color:#fff;font-size:20px;border-radius:8px}
+
+/* ===== Hero ===== */
+.hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(ellipse 80% 70% at 85% 20%, rgba(4,159,230,.35), transparent 55%),
+    linear-gradient(135deg,#1A2A7A 0%,var(--blue-deep) 38%,var(--blue-mid) 72%,var(--blue) 100%);
+  color:#fff;padding:72px 0 64px;
+}
+.hero::after{
+  content:'';position:absolute;right:-80px;bottom:-120px;width:360px;height:360px;
+  border:48px solid rgba(255,255,255,.06);border-radius:50%;pointer-events:none;
+}
+.hero-grid{
+  display:grid;grid-template-columns:1.2fr .8fr;gap:48px;align-items:center;
+  position:relative;z-index:1;
+}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:12px;letter-spacing:.22em;color:#FFE08A;
+  border:1px solid rgba(255,224,138,.55);padding:5px 12px;border-radius:999px;
+  background:rgba(255,255,255,.08);margin-bottom:18px;
+}
+.hero h1{
+  font-size:clamp(28px,4.2vw,44px);font-weight:700;letter-spacing:.06em;line-height:1.2;
+  margin-bottom:14px;
+}
+.hero h1 em{font-style:normal;color:#FFD24A}
+.hero .lead{
+  font-size:15px;line-height:1.85;color:rgba(255,255,255,.88);max-width:34em;
+  margin-bottom:28px;
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:12px}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  height:44px;padding:0 22px;border-radius:10px;font-size:14px;font-weight:600;
+  letter-spacing:.06em;transition:transform .15s,box-shadow .15s,background .15s;
+}
+.btn-primary{background:#fff;color:var(--blue-deep);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.btn-primary:hover{transform:translateY(-2px)}
+.btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.45)}
+.btn-ghost:hover{background:rgba(255,255,255,.22)}
+.stats{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+}
+.stat{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);
+  border-radius:var(--radius);padding:18px 16px;backdrop-filter:blur(6px);
+}
+.stat b{display:block;font-size:26px;font-weight:700;letter-spacing:.04em;color:#FFD24A;line-height:1.1}
+.stat span{display:block;margin-top:6px;font-size:12px;color:rgba(255,255,255,.85);letter-spacing:.06em}
+
+/* ===== Section shell ===== */
+.section{padding:56px 0}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  margin-bottom:22px;flex-wrap:wrap;
+}
+.section-kicker{
+  font-size:12px;letter-spacing:.28em;color:var(--blue);font-weight:700;margin-bottom:6px;
+}
+.section-title{font-size:26px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
+.section-desc{font-size:13.5px;color:var(--sub);margin-top:6px;max-width:36em;line-height:1.7}
+.section-rule{
+  height:2px;width:48px;background:linear-gradient(90deg,var(--blue-deep),var(--blue));
+  margin-top:12px;border-radius:2px;
+}
+
+/* ===== Filter chips ===== */
+.filters{
+  display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;
+  position:sticky;top:calc(var(--nav-h) + 8px);z-index:50;
+  padding:10px 0;background:linear-gradient(180deg,var(--bg) 70%,transparent);
+}
+.chip{
+  font-size:13px;color:#1F3A7A;background:#fff;border:1px solid var(--border);
+  border-radius:999px;padding:8px 14px;transition:all .15s;
+  box-shadow:0 1px 4px rgba(20,40,120,.04);
+}
+.chip:hover{border-color:var(--blue);color:var(--blue);transform:translateY(-1px)}
+.chip.on{
+  background:linear-gradient(90deg,var(--blue-deep),var(--blue));
+  border-color:var(--blue-deep);color:#fff;
+}
+.chip .n{opacity:.7;margin-left:4px;font-size:11px}
+
+/* ===== Product cards ===== */
+.grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;
+}
+.tile{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;cursor:pointer;text-align:left;
+  box-shadow:var(--shadow);
+  transition:transform .2s cubic-bezier(.22,1,.32,1),box-shadow .2s,border-color .2s;
+  opacity:0;transform:translateY(12px);
+}
+.tile.in{opacity:1;transform:none}
+.tile:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);border-color:#B8CCF0}
+.tile.on{border-color:var(--blue);box-shadow:0 0 0 3px rgba(4,159,230,.18),var(--shadow-hover)}
+.tile .imgwrap{
+  aspect-ratio:1;background:#fff;border-bottom:3px solid var(--green-soft);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+}
+.tile .imgwrap img{width:100%;height:100%;object-fit:contain;transition:transform .3s}
+.tile:hover .imgwrap img{transform:scale(1.04)}
+.tile .body{padding:14px 14px 16px}
+.tile .code{
+  font-size:13px;font-weight:700;color:var(--orange);letter-spacing:.04em;
+  display:inline-block;background:var(--orange-soft);border-radius:6px;padding:2px 8px;
+  margin-bottom:8px;
+}
+.tile .nm{
+  font-size:15px;font-weight:600;color:var(--ink);line-height:1.35;letter-spacing:.02em;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:2.7em;
+}
+.tile .meta{
+  margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);
+  display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--sub);
+}
+.tile .meta i{font-style:normal;color:var(--mute);margin-right:4px}
+.tile.hide{display:none}
+
+/* ===== Categories strip ===== */
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.cat-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px 18px;box-shadow:var(--shadow);cursor:pointer;text-align:left;
+  transition:transform .2s,box-shadow .2s,border-color .2s;
+  border-left:4px solid var(--green);
+}
+.cat-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover);border-left-color:var(--blue)}
+.cat-card h3{font-size:16px;font-weight:700;letter-spacing:.06em;margin-bottom:8px;color:var(--ink)}
+.cat-card p{font-size:13px;color:var(--sub);line-height:1.65;margin-bottom:12px}
+.cat-card .cnt{
+  font-size:12px;color:var(--blue);font-weight:600;letter-spacing:.08em;
+}
+
+/* ===== About ===== */
+.about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:start}
+.panel{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:28px 28px 24px;box-shadow:var(--shadow);
+}
+.panel h3{font-size:20px;font-weight:700;letter-spacing:.08em;margin-bottom:14px}
+.panel p{font-size:14.5px;line-height:1.9;color:#333;margin-bottom:12px}
+.motto{
+  margin-top:8px;padding:14px 16px;border-radius:10px;
+  background:linear-gradient(90deg,var(--blue-deep),var(--blue));
+  color:#fff;text-align:center;font-size:15px;font-weight:600;letter-spacing:.14em;
+}
+.fact-list{display:flex;flex-direction:column;gap:0}
+.fact{
+  display:grid;grid-template-columns:72px 1fr;gap:10px;
+  padding:12px 0;border-bottom:1px dashed var(--line);font-size:14px;line-height:1.6;
+}
+.fact:last-child{border-bottom:none}
+.fact b{color:var(--blue-deep);font-weight:600}
+.fact span{color:#333}
+
+/* ===== Contact band ===== */
+.contact-band{
+  background:
+    radial-gradient(ellipse 60% 80% at 90% 30%, rgba(4,159,230,.4), transparent 50%),
+    linear-gradient(100deg,var(--blue-deep),var(--blue-mid) 55%,var(--blue));
+  color:#fff;border-radius:20px;padding:36px 36px;
+  display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;
+  box-shadow:0 16px 40px rgba(20,40,120,.2);
+}
+.contact-band h3{font-size:24px;letter-spacing:.1em;margin-bottom:10px}
+.contact-band .sub{font-size:14px;opacity:.9;line-height:1.7;margin-bottom:18px}
+.contact-actions{display:flex;flex-wrap:wrap;gap:10px}
+.info-list{display:grid;gap:10px}
+.info-item{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.55;
+}
+.info-item b{display:block;font-size:11px;letter-spacing:.16em;opacity:.8;margin-bottom:3px;font-weight:500}
+.info-item span{font-weight:500;word-break:break-all}
+
+/* ===== Footer ===== */
+.footer{
+  margin-top:24px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-mid) 50%,var(--blue));
+  color:#fff;padding:18px 0;
+}
+.footer-inner{
+  width:min(var(--max),calc(100% - 40px));margin-inline:auto;
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;
+  font-size:13px;letter-spacing:.04em;
+}
+.footer-inner b{font-weight:600}
+
+/* ===== Detail drawer ===== */
+.drawer-mask{
+  position:fixed;inset:0;background:rgba(15,25,60,.45);z-index:200;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+.drawer-mask.open{opacity:1;pointer-events:auto}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;width:min(400px,100%);z-index:210;
+  background:#fff;box-shadow:-12px 0 40px rgba(10,20,60,.2);
+  transform:translateX(105%);transition:transform .35s cubic-bezier(.22,1,.32,1);
+  display:flex;flex-direction:column;
+}
+.drawer.open{transform:none}
+.drawer-hd{
+  background:linear-gradient(90deg,var(--blue-deep),var(--blue));
+  color:#fff;padding:18px 52px 16px 20px;position:relative;flex:none;
+}
+.drawer-hd .tag{
+  display:inline-block;font-size:11px;letter-spacing:.16em;color:#FFE08A;
+  border:1px solid rgba(255,224,138,.55);padding:2px 8px;border-radius:999px;margin-bottom:8px;
+}
+.drawer-hd .code{font-size:13px;font-weight:700;color:#FFD24A;letter-spacing:.12em;margin-bottom:4px}
+.drawer-hd h2{font-size:22px;font-weight:700;letter-spacing:.06em;line-height:1.3}
+.drawer-close{
+  position:absolute;top:14px;right:14px;width:32px;height:32px;border-radius:8px;
+  color:#fff;font-size:16px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.35);
+}
+.drawer-close:hover{background:rgba(255,255,255,.28)}
+.drawer-body{padding:20px 20px 28px;overflow:auto;flex:1}
+.drawer-body .photo{
+  width:100%;aspect-ratio:1;object-fit:contain;background:#fff;
+  border:1px solid var(--green-line);border-radius:10px;margin-bottom:16px;
+}
+.fields{border:1px solid var(--green-line);border-radius:4px;overflow:hidden}
+.fields .row{display:grid;grid-template-columns:64px 1fr;border-bottom:1px solid var(--green-line);font-size:14px}
+.fields .row:last-child{border-bottom:none}
+.fields .k{background:var(--green-soft);padding:9px 10px;font-weight:500;color:#333;border-right:1px solid var(--green-line)}
+.fields .v{padding:9px 12px;font-weight:500;color:#111}
+.note{
+  margin-top:14px;font-size:13px;line-height:1.75;color:#333;
+  background:var(--blue-soft);border-left:3px solid var(--blue);padding:12px 14px;border-radius:0 8px 8px 0;
+}
+.tags{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px}
+.tags span{
+  font-size:12px;color:#1F3A7A;background:var(--blue-soft);border:1px solid #B8CCF0;
+  padding:4px 10px;border-radius:6px;
+}
+.drawer-foot{
+  margin-top:16px;padding-top:12px;border-top:1px dashed var(--line);
+  font-size:12.5px;color:var(--sub);line-height:1.7;
+}
+.drawer-foot b{color:var(--blue-deep)}
+
+.count-line{font-size:13px;color:var(--mute);letter-spacing:.06em;margin-bottom:12px}
+
+/* gallery */
+.gallery-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;
+}
+.gitem{
+  border:none;padding:0;background:#fff;border-radius:12px;overflow:hidden;
+  border:1px solid var(--border);box-shadow:var(--shadow);cursor:pointer;
+  aspect-ratio:1;transition:transform .2s,box-shadow .2s;
+}
+.gitem:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+.gitem img{width:100%;height:100%;object-fit:cover;display:block}
+.hide-sec{display:none}
+
+/* ===== Responsive ===== */
+@media (max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:28px}
+  .about-grid{grid-template-columns:1fr}
+  .contact-band{grid-template-columns:1fr;padding:28px 22px}
+  .nav-links{display:none}
+  .nav-links.open{
+    display:flex;flex-direction:column;align-items:stretch;
+    position:absolute;top:var(--nav-h);left:0;right:0;
+    background:linear-gradient(180deg,var(--blue-deep),var(--blue-mid));
+    padding:12px 16px 16px;box-shadow:0 8px 20px rgba(0,0,0,.2);
+  }
+  .nav-toggle{display:grid;place-items:center}
+  .nav-cta{display:none}
+  .nav-links.open .nav-cta{display:inline-flex;margin:8px 0 0;justify-content:center}
+}
+@media (max-width:560px){
+  .hero{padding:48px 0 44px}
+  .stats{grid-template-columns:1fr 1fr}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px}
+  .tile .body{padding:10px 10px 12px}
+  .tile .nm{font-size:13.5px;min-height:0}
+  .section{padding:40px 0}
+  .section-title{font-size:22px}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top">
+      <img src="assets/logo.png" alt="超盛纺配">
+      <div class="t"><b>超盛纺配</b><span>CHAOSHENG · PICANOL</span></div>
+    </a>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
+    <nav class="nav-links" id="navLinks">
+      <a href="#products">产品目录</a>
+      <a href="#categories">产品分类</a>
+      <a href="#gallery">实拍相册</a>
+      <a href="#about">企业简介</a>
+      <a href="#contact">联系我们</a>
+      <a class="nav-cta" href="https://csfzpj.1688.com" target="_blank" rel="noopener">1688 店铺</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero" id="top">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow">YUYAO CHAOSHENG · SINCE 2000</div>
+      <h1>必佳诺 <em>PICANOL</em><br>喷气织机配件</h1>
+      <p class="lead">
+        余姚市超盛纺织配件厂专注喷气织机配件国产化二十余年，
+        覆盖 PAT-A、DELTA、OMNI、OMNIPLUS、PLUS800、GAMMA、OPTMAX 等系列，
+        以质量求生存，以信誉求发展。
+      </p>
+      <div class="hero-actions">
+        <a class="btn btn-primary" href="#products">浏览产品目录</a>
+        <a class="btn btn-ghost" href="#contact">获取报价</a>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>2000+</b><span>深耕喷气织机配件</span></div>
+      <div class="stat"><b id="statCount">—</b><span>在线展示型号</span></div>
+      <div class="stat"><b id="statCats">—</b><span>核心配件分类</span></div>
+      <div class="stat"><b>全国</b><span>替代进口 · 远销海内外</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="categories">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">CATEGORIES</div>
+        <h2 class="section-title">产品分类</h2>
+        <div class="section-rule"></div>
+        <p class="section-desc">按织机系统划分，点击卡片可筛选对应型号。</p>
+      </div>
+    </div>
+    <div class="cat-grid" id="catGrid"></div>
+  </div>
+</section>
+
+<section class="section" id="products" style="padding-top:12px">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">CATALOG</div>
+        <h2 class="section-title">产品目录</h2>
+        <div class="section-rule"></div>
+      </div>
+      <div class="count-line" id="countLabel"></div>
+    </div>
+    <div class="filters" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section class="section" id="gallery">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">GALLERY</div>
+        <h2 class="section-title">产品实拍</h2>
+        <div class="section-rule"></div>
+        <p class="section-desc">相机实拍原片，点击查看大图，便于对照询盘。</p>
+      </div>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="container about-grid">
+    <div class="panel">
+      <div class="section-kicker">COMPANY</div>
+      <h3>企业简介</h3>
+      <p>
+        浙江省余姚市超盛纺织配件厂紧靠杭甬高速公路余姚道口，距余姚市区约 6 公里，
+        离宁波机场约 40 公里，交通便捷。
+      </p>
+      <p>
+        本厂自 2000 年起专业开发生产必佳诺 PICANOL 喷气织机配件国产化产品，
+        精心研制 PAT-A、DELTA、OMNI、OMNIPLUS、PLUS800、GAMMA、OPTMAX 等系列机型配件，
+        产品替代进口并远销国内外，深受用户好评。
+      </p>
+      <div class="motto">以质量求生存 · 以信誉求发展</div>
+    </div>
+    <div class="panel">
+      <div class="section-kicker">PROFILE</div>
+      <h3>关键信息</h3>
+      <div class="fact-list">
+        <div class="fact"><b>厂名</b><span>余姚市超盛纺织配件厂</span></div>
+        <div class="fact"><b>方向</b><span>PICANOL 喷气织机配件国产化</span></div>
+        <div class="fact"><b>起步</b><span>2000 年</span></div>
+        <div class="fact"><b>方针</b><span>质量第一 · 信誉第一 · 用户至上 · 勇于创新</span></div>
+        <div class="fact"><b>地址</b><span>浙江省余姚市梨洲街道黄箭山新吕家 16A</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="contact" style="padding-bottom:40px">
+  <div class="container">
+    <div class="contact-band">
+      <div>
+        <div class="section-kicker" style="color:#FFE08A">CONTACT</div>
+        <h3>欢迎来电洽谈</h3>
+        <p class="sub">支持来图定制、型号替代与批量供货。也可通过 1688 店铺在线询盘。</p>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href="tel:057462561851">电话 0574-62561851</a>
+          <a class="btn btn-ghost" href="https://csfzpj.1688.com" target="_blank" rel="noopener">打开 1688</a>
+        </div>
+      </div>
+      <div class="info-list">
+        <div class="info-item"><b>TEL / FAX</b><span>0574-62561851 · 0574-62585126</span></div>
+        <div class="info-item"><b>手机 / QQ</b><span>13605846068 · 793803503 / 269127989</span></div>
+        <div class="info-item"><b>邮箱</b><span>lhj@cnool.net</span></div>
+        <div class="info-item"><b>地址</b><span>浙江省余姚市梨洲街道黄箭山新吕家 16A</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div><b>ADD：</b>浙江省余姚市梨洲街道黄箭山新吕家16A</div>
+    <div>余姚市超盛纺织配件厂 · PICANOL AIR-JET LOOM PARTS</div>
+  </div>
+</footer>
+
+<div class="drawer-mask" id="mask"></div>
+<aside class="drawer" id="drawer" aria-hidden="true">
+  <div class="drawer-hd">
+    <button class="drawer-close" id="drawerClose" aria-label="关闭">✕</button>
+    <div class="tag" id="dCat">配件</div>
+    <div class="code" id="dCode"></div>
+    <h2 id="dName"></h2>
+  </div>
+  <div class="drawer-body">
+    <img class="photo" id="dPhoto" alt="">
+    <div class="fields">
+      <div class="row"><div class="k">名称</div><div class="v" id="dFName">—</div></div>
+      <div class="row"><div class="k">机型</div><div class="v" id="dMachine">—</div></div>
+      <div class="row"><div class="k">件号</div><div class="v" id="dPart">—</div></div>
+      <div class="row"><div class="k">分类</div><div class="v" id="dCat2">—</div></div>
+      <div class="row"><div class="k">来源</div><div class="v">产品画册 2020.03</div></div>
+    </div>
+    <div class="note" id="dNote"></div>
+    <div class="tags" id="dTags"></div>
+    <div class="drawer-foot"><b>以质量求生存 · 以信誉求发展</b><br>TEL 0574-62561851 · M.T 13605846068</div>
+  </div>
+</aside>
+
+<script>
+const PRODUCTS = [];
+let GALLERY = [];
+let CATS = ['全部'];
+const CAT_DESC = {
+  '传动齿轮':'形星齿轮、罩壳、轴承与同步带等传动单元，覆盖 PLUS / OMNI 等主力机型。',
+  '绞边装置':'绞边架、绞边筒子与总成，适配 PICANOL、丰田、津田驹、舒美特。',
+  '传感器与紧固':'传感器、传感架、弹簧片与通用紧固件，现场维保常用件。',
+  '离合器':'八角夹座、十字块、油泵离合器与缓冲件，国产化替代重点品类。',
+  '导板棕框':'多槽导板、棕框连接片与提综相关导件，稳定开口与引纬路径。',
+  '卷布辊':'压块、压脚、手柄与轴套，卷取张力关键配件。',
+  '剪切组件':'剪刀支架、机剪、夹片与轴承，纬纱剪切系统配件。',
+  '气动气管':'快速接头、气管连接器、薄膜片与调压阀，喷气引纬气路件。',
+  '储纬器':'绕纱盘、张力器、夹丝器等储纬系统配件。',
+  '引纬喷气':'主喷、导纱、定径等引纬相关配件。',
+  '其他配件':'未归类配件，欢迎按名称或件号询盘。'
+};
+
+const grid = document.getElementById('grid');
+const chipsEl = document.getElementById('chips');
+const catGrid = document.getElementById('catGrid');
+const countLabel = document.getElementById('countLabel');
+const drawer = document.getElementById('drawer');
+const mask = document.getElementById('mask');
+let activeCat = '全部';
+let selectedId = null;
+
+function imgOf(p){
+  return p.img || (`assets/products/${p.code}.jpg`);
+}
+function idOf(p){
+  return p.img || p.code;
+}
+function countOf(cat){
+  if(cat==='全部') return PRODUCTS.length;
+  return PRODUCTS.filter(p=>p.cat===cat).length;
+}
+function rebuildCats(){
+  const order = ['全部','传动齿轮','绞边装置','传感器与紧固','离合器','导板棕框','卷布辊','剪切组件','气动气管','储纬器','引纬喷气','其他配件'];
+  const seen = new Set(PRODUCTS.map(p=>p.cat));
+  const rest = [...seen].filter(c=>!order.includes(c));
+  CATS = ['全部', ...order.filter(c=>c!=='全部'&&seen.has(c)), ...rest.sort()];
+  // update hero counts
+  const elN = document.getElementById('statCount');
+  const elC = document.getElementById('statCats');
+  if(elN) elN.textContent = String(PRODUCTS.length);
+  if(elC) elC.textContent = String(CATS.length-1);
+}
+
+function renderCats(){
+  catGrid.innerHTML = CATS.filter(c=>c!=='全部').map(c=>`
+    <button type="button" class="cat-card" data-cat="${c}">
+      <h3>${c}</h3>
+      <p>${CAT_DESC[c]||'按名称与件号询盘，支持来图定制。'}</p>
+      <div class="cnt">${countOf(c)} 个型号 →</div>
+    </button>
+  `).join('');
+  catGrid.querySelectorAll('.cat-card').forEach(el=>{
+    el.addEventListener('click',()=>{
+      activeCat = el.dataset.cat;
+      renderChips();
+      applyFilter();
+      document.getElementById('products').scrollIntoView({behavior:'smooth'});
+    });
+  });
+}
+
+function renderChips(){
+  chipsEl.innerHTML = CATS.map(c=>
+    `<button type="button" class="chip${c===activeCat?' on':''}" data-cat="${c}">${c}<span class="n">${countOf(c)}</span></button>`
+  ).join('');
+  chipsEl.querySelectorAll('.chip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      activeCat = btn.dataset.cat;
+      renderChips();
+      applyFilter();
+    });
+  });
+}
+
+function renderGrid(){
+  grid.innerHTML = PRODUCTS.map((p,i)=>`
+    <button type="button" class="tile" data-i="${i}" data-cat="${p.cat}">
+      <div class="imgwrap"><img src="${imgOf(p)}" alt="${p.name}" loading="lazy"></div>
+      <div class="body">
+        <div class="code">${p.code}</div>
+        <div class="nm">${p.name}</div>
+        <div class="meta">
+          <div><i>机型</i>${p.machine||'通用'}</div>
+          <div><i>件号</i>${p.part||'—'}</div>
+        </div>
+      </div>
+    </button>
+  `).join('');
+  const tiles=[...grid.querySelectorAll('.tile')];
+  tiles.forEach(t=>t.addEventListener('click',()=>openProduct(+t.dataset.i)));
+  const io=new IntersectionObserver(es=>{
+    es.forEach(en=>{
+      if(en.isIntersecting){
+        const i=tiles.indexOf(en.target);
+        setTimeout(()=>en.target.classList.add('in'), Math.min(i%12,12)*30);
+        io.unobserve(en.target);
+      }
+    });
+  },{threshold:.06});
+  tiles.forEach(t=>io.observe(t));
+}
+
+function renderGallery(){
+  const box = document.getElementById('galleryGrid');
+  if(!box || typeof GALLERY==='undefined' || !GALLERY.length){
+    if(box) box.closest('section')?.classList.add('hide-sec');
+    return;
+  }
+  box.innerHTML = GALLERY.map(src=>`
+    <button type="button" class="gitem" data-src="${src}">
+      <img src="${src}" alt="实拍图" loading="lazy">
+    </button>
+  `).join('');
+  box.querySelectorAll('.gitem').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const src=el.dataset.src;
+      document.getElementById('dCat').textContent='实拍';
+      document.getElementById('dCode').textContent='PHOTO';
+      document.getElementById('dName').textContent='产品实拍';
+      document.getElementById('dFName').textContent='产品实拍';
+      document.getElementById('dPhoto').src=src;
+      document.getElementById('dPhoto').alt='产品实拍';
+      document.getElementById('dMachine').textContent='—';
+      document.getElementById('dPart').textContent='—';
+      document.getElementById('dCat2').textContent='实拍相册';
+      document.getElementById('dNote').textContent='来自实拍相册，可按参考图询盘。';
+      document.getElementById('dTags').innerHTML=['实拍','询盘参考'].map(t=>`<span>${t}</span>`).join('');
+      drawer.classList.add('open'); mask.classList.add('open');
+    });
+  });
+}
+
+function applyFilter(){
+  let visible=0;
+  grid.querySelectorAll('.tile').forEach(t=>{
+    const ok=activeCat==='全部'||t.dataset.cat===activeCat;
+    t.classList.toggle('hide',!ok);
+    if(ok){visible++; t.classList.add('in');}
+  });
+  countLabel.textContent=`${visible} 件 · 当前筛选：${activeCat}`;
+}
+
+function openProduct(i){
+  const p=PRODUCTS[i];
+  if(!p) return;
+  selectedId=i;
+  document.getElementById('dCat').textContent=p.cat;
+  document.getElementById('dCode').textContent=p.code;
+  document.getElementById('dName').textContent=p.name;
+  document.getElementById('dFName').textContent=p.name;
+  document.getElementById('dPhoto').src=imgOf(p);
+  document.getElementById('dPhoto').alt=p.name;
+  document.getElementById('dMachine').textContent=p.machine||'通用';
+  document.getElementById('dPart').textContent=p.part||'—';
+  document.getElementById('dCat2').textContent=p.cat;
+  document.getElementById('dNote').textContent=CAT_DESC[p.cat]||'适用于必佳诺喷气织机的国产化替代配件。';
+  document.getElementById('dTags').innerHTML=[p.cat,p.machine||'通用','国产替代','可定制']
+    .map(t=>`<span>${t}</span>`).join('');
+  drawer.classList.add('open');
+  mask.classList.add('open');
+  drawer.setAttribute('aria-hidden','false');
+  grid.querySelectorAll('.tile').forEach(t=>t.classList.toggle('on',+t.dataset.i===i));
+}
+
+function closeDrawer(){
+  drawer.classList.remove('open');
+  mask.classList.remove('open');
+  drawer.setAttribute('aria-hidden','true');
+  selectedId=null;
+  grid.querySelectorAll('.tile').forEach(t=>t.classList.remove('on'));
+}
+
+document.getElementById('drawerClose').addEventListener('click',closeDrawer);
+mask.addEventListener('click',closeDrawer);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeDrawer()});
+
+document.getElementById('navToggle').addEventListener('click',()=>{
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('#navLinks a').forEach(a=>{
+  a.addEventListener('click',()=>document.getElementById('navLinks').classList.remove('open'));
+});
+</script>
+<script src="assets/products-data.js"></script>
+<script>
+rebuildCats();
+renderCats();
+renderChips();
+renderGrid();
+renderGallery();
+applyFilter();
+</script>
+</body>
+</html>
