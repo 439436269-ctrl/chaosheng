@@ -336,6 +336,49 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .gitem img{width:100%;height:100%;object-fit:cover;display:block}
 .hide-sec{display:none}
 
+/* 新产品推荐 */
+.new-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;
+}
+.new-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow);
+  border-top:3px solid var(--orange);
+  transition:transform .2s,box-shadow .2s;
+  display:flex;flex-direction:column;
+}
+.new-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover)}
+.new-card .imgwrap{
+  aspect-ratio:1;background:#fff;display:flex;align-items:center;justify-content:center;
+  border-bottom:1px dashed var(--line);overflow:hidden;
+}
+.new-card .imgwrap img{width:100%;height:100%;object-fit:contain}
+.new-card .body{padding:12px 14px 14px}
+.new-card .badge{
+  display:inline-block;font-size:10px;letter-spacing:.14em;font-weight:700;
+  color:#fff;background:var(--orange);border-radius:99px;padding:2px 8px;margin-bottom:6px;
+}
+.new-card .code{font-size:12.5px;font-weight:700;color:var(--orange);letter-spacing:.04em}
+.new-card .nm{font-size:14px;font-weight:600;margin-top:4px;line-height:1.35;color:var(--ink)}
+.new-card .meta{margin-top:6px;font-size:12px;color:var(--sub)}
+.new-card.empty{
+  border-top-color:var(--border);
+  border-style:dashed;border-width:1px;border-top:3px dashed var(--border);
+  min-height:220px;align-items:center;justify-content:center;text-align:center;
+  background:repeating-linear-gradient(135deg,#fff,#fff 12px,#F7F9FC 12px,#F7F9FC 24px);
+}
+.new-card.empty .ph{
+  padding:28px 16px;color:var(--mute);font-size:13px;line-height:1.7;
+}
+.new-card.empty .ph b{
+  display:block;color:var(--sub);font-size:14px;margin-bottom:6px;font-weight:600;
+}
+.new-card.empty .ph .plus{
+  width:40px;height:40px;margin:0 auto 10px;border-radius:50%;
+  border:2px dashed #B8C4DE;display:flex;align-items:center;justify-content:center;
+  font-size:22px;color:#8A93A6;
+}
+
 /* docs / PDF */
 .docs-grid{
   display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;
@@ -423,6 +466,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
     <nav class="nav-links" id="navLinks">
       <a href="#products">产品目录</a>
+      <a href="#new">新产品推荐</a>
       <a href="#categories">产品分类</a>
       <a href="#docs">技术资料</a>
       <a href="#gallery">实拍相册</a>
@@ -453,6 +497,20 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="stat"><b id="statCats">—</b><span>核心配件分类</span></div>
       <div class="stat"><b>全国</b><span>替代进口 · 远销海内外</span></div>
     </div>
+  </div>
+</section>
+
+<section class="section" id="new">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">NEW ARRIVALS</div>
+        <h2 class="section-title">新产品推荐</h2>
+        <div class="section-rule"></div>
+        <p class="section-desc">示例展示（当前为传动齿轮）。后续可整卡替换为你的新图，空位用于上新。</p>
+      </div>
+    </div>
+    <div class="new-grid" id="newGrid"></div>
   </div>
 </section>
 
@@ -713,6 +771,42 @@ function renderGrid(){
   tiles.forEach(t=>io.observe(t));
 }
 
+function renderNewArrivals(){
+  const box = document.getElementById('newGrid');
+  if(!box) return;
+  // 示例：传动齿轮（可整段替换为你自己的新图）
+  const samples = [
+    { code:'CS-1001', name:'形星齿轮总成', img:'assets/products/CS001-1_BE301128.jpg', part:'BE301128' },
+    { code:'CS-1003', name:'形星齿轮盘', img:'assets/products/CS002-1_BE301158.jpg', part:'BE301158' },
+    { code:'CS-1004', name:'形星齿轮盘', img:'assets/products/CS002_BE154359.jpg', part:'BE154359' },
+    { code:'CS-1005', name:'形星齿轮总成 A19', img:'assets/products/CS180_A19A0150803.jpg', part:'A0150803' },
+  ];
+  const placeholders = 2; // 后续补图
+  let html = samples.map(s=>`
+    <article class="new-card">
+      <div class="imgwrap"><img src="${s.img}" alt="${s.name}" loading="lazy"></div>
+      <div class="body">
+        <span class="badge">NEW</span>
+        <div class="code">${s.code}</div>
+        <div class="nm">${s.name}</div>
+        <div class="meta">件号 ${s.part}</div>
+      </div>
+    </article>
+  `).join('');
+  for(let i=0;i<placeholders;i++){
+    html += `
+      <article class="new-card empty">
+        <div class="ph">
+          <div class="plus">＋</div>
+          <b>预留位 ${i+1}</b>
+          后续放入新产品图片<br>与编号即可
+        </div>
+      </article>
+    `;
+  }
+  box.innerHTML = html;
+}
+
 function renderDocs(){
   const box = document.getElementById('docsGrid');
   const DOCS = [
@@ -881,6 +975,7 @@ document.querySelectorAll('#navLinks a').forEach(a=>{
 <script src="assets/products-data.js"></script>
 <script>
 rebuildCats();
+renderNewArrivals();
 renderCats();
 renderChips();
 renderGrid();
