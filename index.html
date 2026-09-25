@@ -336,6 +336,53 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 .gitem img{width:100%;height:100%;object-fit:cover;display:block}
 .hide-sec{display:none}
 
+/* docs / PDF */
+.docs-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;
+}
+.doc-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 16px 16px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:10px;
+  border-left:4px solid var(--blue-deep);
+  transition:transform .2s,box-shadow .2s;
+}
+.doc-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+.doc-card .dtype{
+  font-size:11px;letter-spacing:.16em;color:var(--blue);font-weight:700;
+}
+.doc-card h3{
+  font-size:15px;font-weight:600;line-height:1.45;color:var(--ink);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:4.2em;
+}
+.doc-card .meta{font-size:12px;color:var(--sub)}
+.doc-card .acts{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.btn-mini{
+  font-size:12.5px;padding:7px 12px;border-radius:8px;text-decoration:none;
+  background:linear-gradient(90deg,var(--blue-deep),var(--blue));color:#fff;
+  border:1px solid var(--blue-deep);cursor:pointer;font-family:inherit;
+  transition:transform .15s;
+}
+.btn-mini:hover{transform:translateY(-1px)}
+.btn-mini.ghost{background:#fff;color:var(--blue-deep)}
+.docs-preview{
+  margin-top:16px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+}
+.docs-preview[hidden]{display:none}
+.docs-preview-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 14px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-mid));
+  color:#fff;font-size:13px;
+}
+.docs-preview-bar .acts, .docs-preview-bar div{display:flex;gap:8px;align-items:center}
+.docs-preview-bar .btn-mini{background:#fff;color:var(--blue-deep);border-color:#fff}
+.docs-preview-bar .btn-mini.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.docs-preview iframe{
+  display:block;width:100%;height:min(72vh,820px);border:0;background:#F4F6F7;
+}
+
 /* ===== Responsive ===== */
 @media (max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:28px}
@@ -377,6 +424,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     <nav class="nav-links" id="navLinks">
       <a href="#products">产品目录</a>
       <a href="#categories">产品分类</a>
+      <a href="#docs">技术资料</a>
       <a href="#gallery">实拍相册</a>
       <a href="#about">企业简介</a>
       <a href="#contact">联系我们</a>
@@ -434,6 +482,30 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     </div>
     <div class="filters" id="chips"></div>
     <div class="grid" id="grid"></div>
+  </div>
+</section>
+
+<section class="section" id="docs">
+  <div class="container">
+    <div class="section-head">
+      <div>
+        <div class="section-kicker">DOCUMENTS</div>
+        <h2 class="section-title">技术资料</h2>
+        <div class="section-rule"></div>
+        <p class="section-desc">储纬器 / 2231 系列说明书与产品画册，点击在线预览或下载。</p>
+      </div>
+    </div>
+    <div class="docs-grid" id="docsGrid"></div>
+    <div class="docs-preview" id="docsPreview" hidden>
+      <div class="docs-preview-bar">
+        <span id="docsPreviewTitle">预览</span>
+        <div>
+          <a id="docsPreviewDl" class="btn-mini" href="#" target="_blank" rel="noopener">下载 PDF</a>
+          <button type="button" class="btn-mini ghost" id="docsPreviewClose">关闭</button>
+        </div>
+      </div>
+      <iframe id="docsPreviewFrame" title="PDF 预览" src=""></iframe>
+    </div>
   </div>
 </section>
 
@@ -641,6 +713,90 @@ function renderGrid(){
   tiles.forEach(t=>io.observe(t));
 }
 
+function renderDocs(){
+  const box = document.getElementById('docsGrid');
+  const DOCS = [
+    {
+      id: 'cat2020',
+      type: '产品画册',
+      title: '余姚市超盛纺织配件厂 产品画册（2020.03）',
+      meta: 'PICANOL 喷气织机配件全册 · 约 25 MB',
+      href: 'assets/docs/catalog-2020.pdf',
+      preview: true
+    },
+    {
+      id: 'cw2024',
+      type: '储纬器说明书',
+      title: '储纬器 2231 X2 / 1131 X2 / Blue_22 / Chrono X3',
+      meta: '2024.9.15 · 含 CAN PFT 等机型',
+      href: 'assets/docs/pdf/chuweiqi-2231-2024.pdf',
+      preview: true
+    },
+    {
+      id: 'cw2020',
+      type: '储纬器说明书',
+      title: '储纬器 2231 X2 / 1131 X2 / Blue_22',
+      meta: '2020-04-03 版本',
+      href: 'assets/docs/pdf/chuweiqi-2231-2020.pdf',
+      preview: true
+    },
+    {
+      id: 'chrono',
+      type: '电气/参数',
+      title: 'Chrono X3 170V（18.12）',
+      meta: '约 4.1 MB',
+      href: 'assets/docs/pdf/chrono-x3-170v.pdf',
+      preview: true
+    },
+    {
+      id: 'exp',
+      type: '技术图纸',
+      title: 'EXP-2231-CAN-plus-PFT',
+      meta: '31-8916-0201-02 · 约 350 KB',
+      href: 'assets/docs/pdf/exp-2231can-plus-pft.pdf',
+      preview: true
+    },
+    {
+      id: 'spl',
+      type: '技术图纸',
+      title: 'SPL-2231-CAN-plus-PFT',
+      meta: '31-8926-0201-05 · 约 66 KB',
+      href: 'assets/docs/pdf/spl-2231-can-plus-pft.pdf',
+      preview: true
+    }
+  ];
+  if(!box) return;
+  box.innerHTML = DOCS.map(d=>`
+    <article class="doc-card" data-id="${d.id}">
+      <div class="dtype">${d.type}</div>
+      <h3>${d.title}</h3>
+      <div class="meta">${d.meta}</div>
+      <div class="acts">
+        <button type="button" class="btn-mini" data-preview="${d.href}" data-title="${d.title}">在线预览</button>
+        <a class="btn-mini ghost" href="${d.href}" target="_blank" rel="noopener">下载</a>
+      </div>
+    </article>
+  `).join('');
+  const preview = document.getElementById('docsPreview');
+  const frame = document.getElementById('docsPreviewFrame');
+  const titleEl = document.getElementById('docsPreviewTitle');
+  const dl = document.getElementById('docsPreviewDl');
+  box.querySelectorAll('[data-preview]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const href = btn.getAttribute('data-preview');
+      titleEl.textContent = btn.getAttribute('data-title') || 'PDF 预览';
+      dl.href = href;
+      frame.src = href;
+      preview.hidden = false;
+      preview.scrollIntoView({behavior:'smooth', block:'nearest'});
+    });
+  });
+  document.getElementById('docsPreviewClose')?.addEventListener('click',()=>{
+    preview.hidden = true;
+    frame.src = '';
+  });
+}
+
 function renderGallery(){
   const box = document.getElementById('galleryGrid');
   if(!box || typeof GALLERY==='undefined' || !GALLERY.length){
@@ -728,6 +884,7 @@ rebuildCats();
 renderCats();
 renderChips();
 renderGrid();
+renderDocs();
 renderGallery();
 applyFilter();
 </script>
