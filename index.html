@@ -139,6 +139,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 }
 .stat b{display:block;font-size:26px;font-weight:700;letter-spacing:.04em;color:#FFD24A;line-height:1.1}
 .stat span{display:block;margin-top:6px;font-size:12px;color:rgba(255,255,255,.85);letter-spacing:.06em}
+.stat-qr .qr-row{display:flex;align-items:center;gap:10px}
+.stat-qr img{
+  width:72px;height:72px;border-radius:8px;background:#fff;display:block;flex:none;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+}
+.stat-qr .qr-row span{
+  margin-top:0;font-size:12.5px;line-height:1.5;color:#fff;letter-spacing:.08em;
+}
 
 /* ===== Section shell ===== */
 .section{padding:56px 0}
@@ -502,10 +510,6 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="hero-actions">
         <a class="btn btn-primary" href="#products">浏览产品目录</a>
         <a class="btn btn-ghost" href="#contact">获取报价</a>
-        <div class="hero-qr">
-          <img src="assets/qrcode_site.png" alt="扫码查看产品图鉴" loading="lazy">
-          <span>扫码查看<br>产品图鉴</span>
-        </div>
       </div>
     </div>
     <div class="stats">
@@ -513,6 +517,12 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="stat"><b id="statCount">—</b><span>在线展示型号</span></div>
       <div class="stat"><b id="statCats">—</b><span>核心配件分类</span></div>
       <div class="stat"><b>全国</b><span>替代进口 · 远销海内外</span></div>
+      <div class="stat stat-qr">
+        <div class="qr-row">
+          <img src="assets/qrcode_site.png" alt="扫码查看产品图鉴" loading="lazy">
+          <span>扫码查看<br>产品图鉴</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
