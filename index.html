@@ -108,6 +108,19 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   margin-bottom:28px;
 }
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px}
+.hero-qr{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.45);
+  border-radius:10px;padding:6px 12px 6px 6px;margin-left:6px;
+  transition:background .15s;
+}
+.hero-qr:hover{background:rgba(255,255,255,.2)}
+.hero-qr img{
+  width:64px;height:64px;border-radius:6px;background:#fff;display:block;
+}
+.hero-qr span{
+  color:#fff;font-size:11.5px;line-height:1.45;letter-spacing:.06em;opacity:.95;
+}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
   height:44px;padding:0 22px;border-radius:10px;font-size:14px;font-weight:600;
@@ -489,6 +502,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="hero-actions">
         <a class="btn btn-primary" href="#products">浏览产品目录</a>
         <a class="btn btn-ghost" href="#contact">获取报价</a>
+        <div class="hero-qr">
+          <img src="assets/qrcode_site.png" alt="扫码查看产品图鉴" loading="lazy">
+          <span>扫码查看<br>产品图鉴</span>
+        </div>
       </div>
     </div>
     <div class="stats">
