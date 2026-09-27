@@ -68,6 +68,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   transition:background .15s,letter-spacing .15s;
 }
 .nav-links a:hover{background:rgba(255,255,255,.14);letter-spacing:.04em}
+.lang-btn{
+  font-size:12px;font-weight:700;letter-spacing:.08em;color:#fff;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.55);
+  border-radius:999px;padding:5px 12px;cursor:pointer;font-family:inherit;
+  transition:background .15s,color .15s;
+}
+.lang-btn:hover{background:#fff;color:var(--blue-deep)}
+.lang-btn.on{background:#FFD24A;border-color:#FFD24A;color:#1A2A7A}
 .nav-cta{
   margin-left:8px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;
   background:#fff;color:var(--blue-deep);transition:transform .15s,box-shadow .15s;
@@ -486,13 +494,14 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
     </a>
     <button class="nav-toggle" id="navToggle" aria-label="菜单">☰</button>
     <nav class="nav-links" id="navLinks">
-      <a href="#products">产品目录</a>
-      <a href="#new">新产品推荐</a>
-      <a href="#categories">产品分类</a>
-      <a href="#docs">技术资料</a>
-      <a href="#gallery">实拍相册</a>
-      <a href="#about">企业简介</a>
-      <a href="#contact">联系我们</a>
+      <a href="#products" data-i18n="nav.products">产品目录</a>
+      <a href="#new" data-i18n="nav.new">新产品推荐</a>
+      <a href="#categories" data-i18n="nav.cats">产品分类</a>
+      <a href="#docs" data-i18n="nav.docs">技术资料</a>
+      <a href="#gallery" data-i18n="nav.gallery">实拍相册</a>
+      <a href="#about" data-i18n="nav.about">企业简介</a>
+      <a href="#contact" data-i18n="nav.contact">联系我们</a>
+      <button type="button" class="lang-btn" id="langBtn" title="切换语言">EN</button>
     </nav>
   </div>
 </header>
@@ -501,26 +510,26 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container hero-grid">
     <div>
       <div class="eyebrow">YUYAO CHAOSHENG · SINCE 2000</div>
-      <h1>必佳诺 <em>PICANOL</em><br>喷气织机配件</h1>
-      <p class="lead">
+      <h1><span id="heroT1">必佳诺</span> <em>PICANOL</em><br><span id="heroT2">喷气织机配件</span></h1>
+      <p class="lead" id="heroLead">
         余姚市超盛纺织配件厂专注喷气织机配件国产化二十余年，
         覆盖 PAT-A、DELTA、OMNI、OMNIPLUS、PLUS800、GAMMA、OPTMAX 等系列，
         以质量求生存，以信誉求发展。
       </p>
       <div class="hero-actions">
-        <a class="btn btn-primary" href="#products">浏览产品目录</a>
-        <a class="btn btn-ghost" href="#contact">获取报价</a>
+        <a class="btn btn-primary" href="#products" id="heroB1">浏览产品目录</a>
+        <a class="btn btn-ghost" href="#contact" id="heroB2">获取报价</a>
       </div>
     </div>
     <div class="stats">
-      <div class="stat"><b>2000+</b><span>深耕喷气织机配件</span></div>
-      <div class="stat"><b id="statCount">—</b><span>在线展示型号</span></div>
-      <div class="stat"><b id="statCats">—</b><span>核心配件分类</span></div>
-      <div class="stat"><b>全国</b><span>替代进口 · 远销海内外</span></div>
+      <div class="stat"><b>2000+</b><span id="st1">深耕喷气织机配件</span></div>
+      <div class="stat"><b id="statCount">—</b><span id="st2">在线展示型号</span></div>
+      <div class="stat"><b id="statCats">—</b><span id="st3">核心配件分类</span></div>
+      <div class="stat"><b>全国</b><span id="st4">替代进口 · 远销海内外</span></div>
       <div class="stat stat-qr">
         <div class="qr-row">
-          <img src="assets/qrcode_site.png" alt="扫码查看产品图鉴" loading="lazy">
-          <span>扫码查看<br>产品图鉴</span>
+          <img src="assets/qrcode_site.png" alt="QR" loading="lazy">
+          <span id="statQr">扫码查看<br>产品图鉴</span>
         </div>
       </div>
     </div>
@@ -531,10 +540,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="section-kicker">NEW ARRIVALS</div>
-        <h2 class="section-title">新产品推荐</h2>
+        <div class="section-kicker" id="secNewK">NEW ARRIVALS</div>
+        <h2 class="section-title" id="secNew">新产品推荐</h2>
         <div class="section-rule"></div>
-        <p class="section-desc">示例展示（当前为传动齿轮）。后续可整卡替换为你的新图，空位用于上新。</p>
+        <p class="section-desc" id="secNewD">2026.09 新品实拍展示，后续可继续补充图片。</p>
       </div>
     </div>
     <div class="new-grid" id="newGrid"></div>
@@ -545,10 +554,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="section-kicker">CATEGORIES</div>
-        <h2 class="section-title">产品分类</h2>
+        <div class="section-kicker" id="secCatsK">CATEGORIES</div>
+        <h2 class="section-title" id="secCats">产品分类</h2>
         <div class="section-rule"></div>
-        <p class="section-desc">按织机系统划分，点击卡片可筛选对应型号。</p>
+        <p class="section-desc" id="secCatsD">按织机系统划分，点击卡片可筛选对应型号。</p>
       </div>
     </div>
     <div class="cat-grid" id="catGrid"></div>
@@ -559,8 +568,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="section-kicker">CATALOG</div>
-        <h2 class="section-title">产品目录</h2>
+        <div class="section-kicker" id="secProdK">CATALOG</div>
+        <h2 class="section-title" id="secProd">产品目录</h2>
         <div class="section-rule"></div>
       </div>
       <div class="count-line" id="countLabel"></div>
@@ -574,10 +583,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="section-kicker">DOCUMENTS</div>
-        <h2 class="section-title">技术资料</h2>
+        <div class="section-kicker" id="secDocsK">DOCUMENTS</div>
+        <h2 class="section-title" id="secDocs">技术资料</h2>
         <div class="section-rule"></div>
-        <p class="section-desc">储纬器 / 2231 系列说明书与产品画册，点击在线预览或下载。</p>
+        <p class="section-desc" id="secDocsD">储纬器 / 2231 系列说明书与产品画册，点击在线预览或下载。</p>
       </div>
     </div>
     <div class="docs-grid" id="docsGrid"></div>
@@ -598,10 +607,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container">
     <div class="section-head">
       <div>
-        <div class="section-kicker">GALLERY</div>
-        <h2 class="section-title">产品实拍</h2>
+        <div class="section-kicker" id="secGalK">GALLERY</div>
+        <h2 class="section-title" id="secGal">产品实拍</h2>
         <div class="section-rule"></div>
-        <p class="section-desc">相机实拍原片，点击查看大图，便于对照询盘。</p>
+        <p class="section-desc" id="secGalD">相机实拍原片，点击查看大图，便于对照询盘。</p>
       </div>
     </div>
     <div class="gallery-grid" id="galleryGrid"></div>
@@ -611,8 +620,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 <section class="section" id="about">
   <div class="container about-grid">
     <div class="panel">
-      <div class="section-kicker">COMPANY</div>
-      <h3>企业简介</h3>
+      <div class="section-kicker" id="secAboutK">COMPANY</div>
+      <h3 id="secAbout">企业简介</h3>
       <p>
         浙江省余姚市超盛纺织配件厂紧靠杭甬高速公路余姚道口，距余姚市区约 6 公里，
         离宁波机场约 40 公里，交通便捷。
@@ -625,8 +634,8 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
       <div class="motto">以质量求生存 · 以信誉求发展</div>
     </div>
     <div class="panel">
-      <div class="section-kicker">PROFILE</div>
-      <h3>关键信息</h3>
+      <div class="section-kicker" id="secProfK">PROFILE</div>
+      <h3 id="secProf">关键信息</h3>
       <div class="fact-list">
         <div class="fact"><b>厂名</b><span>余姚市超盛纺织配件厂</span></div>
         <div class="fact"><b>方向</b><span>PICANOL 喷气织机配件国产化</span></div>
@@ -642,9 +651,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   <div class="container">
     <div class="contact-band">
       <div>
-        <div class="section-kicker" style="color:#FFE08A">CONTACT</div>
-        <h3>欢迎来电洽谈</h3>
-        <p class="sub">支持来图定制、型号替代与批量供货，欢迎来电或在线留言询盘。</p>
+        <div class="section-kicker" id="secContactK" style="color:#FFE08A">CONTACT</div>
+        <h3 id="secContact">欢迎来电洽谈</h3>
+        <p class="sub" id="contactSub">支持来图定制、型号替代与批量供货，欢迎来电或在线留言询盘。</p>
         <div class="contact-actions">
           <a class="btn btn-primary" href="tel:057462561851">电话 0574-62561851</a>
           <a class="btn btn-ghost" href="tel:13605846068">手机 13605846068</a>
@@ -663,7 +672,7 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
 
 <footer class="footer">
   <div class="footer-inner">
-    <div><b>ADD：</b>浙江省余姚市梨洲街道黄箭山新吕家16A</div>
+    <div id="footAdd"><b>ADD：</b>浙江省余姚市梨洲街道黄箭山新吕家16A</div>
     <div>余姚市超盛纺织配件厂 · PICANOL AIR-JET LOOM PARTS</div>
   </div>
 </footer>
@@ -801,15 +810,18 @@ function renderGrid(){
 function renderNewArrivals(){
   const box = document.getElementById('newGrid');
   if(!box) return;
-  // 示例：传动齿轮（可整段替换为你自己的新图）
-  const samples = [
-    { code:'CS-1001', name:'形星齿轮总成', img:'assets/products/CS001-1_BE301128.jpg', part:'BE301128' },
-    { code:'CS-1003', name:'形星齿轮盘', img:'assets/products/CS002-1_BE301158.jpg', part:'BE301158' },
-    { code:'CS-1004', name:'形星齿轮盘', img:'assets/products/CS002_BE154359.jpg', part:'BE154359' },
-    { code:'CS-1005', name:'形星齿轮总成 A19', img:'assets/products/CS180_A19A0150803.jpg', part:'A0150803' },
+  // 2026.09.27 新品实拍（已水印）
+  const news = [
+    { code:'NEW-2026-01', name:'蓝色导轮', part:'—', img:'assets/products/new2026_01.jpg' },
+    { code:'NEW-2026-02', name:'剪刀支架', part:'—', img:'assets/products/new2026_02.jpg' },
+    { code:'NEW-2026-03', name:'剪刀支架', part:'—', img:'assets/products/new2026_03.jpg' },
+    { code:'NEW-2026-05', name:'黄色绕纱盘', part:'31-1417', img:'assets/products/new2026_05.jpg' },
+    { code:'NEW-2026-10', name:'黄色绕纱盘', part:'31-1417', img:'assets/products/new2026_10.jpg' },
+    { code:'NEW-2026-11', name:'蓝色壳体', part:'31-1448', img:'assets/products/new2026_11.jpg' },
+    { code:'NEW-2026-16', name:'蓝色壳体', part:'31-1448', img:'assets/products/new2026_16.jpg' },
+    { code:'NEW-2026-18', name:'蓝色壳体', part:'31-1448', img:'assets/products/new2026_18.jpg' },
   ];
-  const placeholders = 2; // 后续补图
-  let html = samples.map(s=>`
+  let html = news.map(s=>`
     <article class="new-card">
       <div class="imgwrap"><img src="${s.img}" alt="${s.name}" loading="lazy"></div>
       <div class="body">
@@ -820,17 +832,15 @@ function renderNewArrivals(){
       </div>
     </article>
   `).join('');
-  for(let i=0;i<placeholders;i++){
-    html += `
-      <article class="new-card empty">
-        <div class="ph">
-          <div class="plus">＋</div>
-          <b>预留位 ${i+1}</b>
-          后续放入新产品图片<br>与编号即可
-        </div>
-      </article>
-    `;
-  }
+  html += `
+    <article class="new-card empty">
+      <div class="ph">
+        <div class="plus">＋</div>
+        <b>预留位</b>
+        后续放入新产品图片<br>与编号即可
+      </div>
+    </article>
+  `;
   box.innerHTML = html;
 }
 
@@ -1009,6 +1019,129 @@ renderGrid();
 renderDocs();
 renderGallery();
 applyFilter();
+
+/* ---- 中英切换 ---- */
+const I18N = {
+  zh: {
+    'nav.products':'产品目录','nav.new':'新产品推荐','nav.cats':'产品分类',
+    'nav.docs':'技术资料','nav.gallery':'实拍相册','nav.about':'企业简介','nav.contact':'联系我们',
+    'hero.title1':'必佳诺','hero.title2':'喷气织机配件',
+    'hero.lead':'余姚市超盛纺织配件厂专注喷气织机配件国产化二十余年，覆盖 PAT-A、DELTA、OMNI、OMNIPLUS、PLUS800、GAMMA、OPTMAX 等系列，以质量求生存，以信誉求发展。',
+    'hero.btn1':'浏览产品目录','hero.btn2':'获取报价',
+    'stat.s1':'深耕喷气织机配件','stat.s2':'在线展示型号','stat.s3':'核心配件分类','stat.s4':'替代进口 · 远销海内外',
+    'stat.qr':'扫码查看<br>产品图鉴',
+    'sec.new':'新产品推荐','sec.new_k':'NEW ARRIVALS',
+    'sec.new_d':'2026.09 新品实拍展示，后续可继续补充图片。',
+    'sec.cats':'产品分类','sec.cats_k':'CATEGORIES',
+    'sec.cats_d':'按织机系统划分，点击卡片可筛选对应型号。',
+    'sec.products':'产品目录','sec.products_k':'CATALOG',
+    'sec.docs':'技术资料','sec.docs_k':'DOCUMENTS',
+    'sec.docs_d':'储纬器 / 2231 系列说明书与产品画册，点击在线预览或下载。',
+    'sec.gallery':'产品实拍','sec.gallery_k':'GALLERY',
+    'sec.gallery_d':'相机实拍原片，点击查看大图，便于对照询盘。',
+    'sec.about':'企业简介','sec.about_k':'COMPANY','sec.profile':'关键信息','sec.profile_k':'PROFILE',
+    'sec.contact':'欢迎来电洽谈','sec.contact_k':'CONTACT',
+    'contact.sub':'支持来图定制、型号替代与批量供货，欢迎来电或在线留言询盘。',
+    'contact.btn1':'电话','contact.btn2':'手机',
+    'footer.add':'ADD：',
+    'badge.new':'新品','meta.part':'件号','meta.mach':'机型','meta.name':'名称','meta.cat':'分类','meta.src':'来源',
+    'btn.preview':'在线预览','btn.download':'下载','btn.close':'关闭',
+    'filter.all':'全部','count.prefix':'件 · 当前筛选：',
+    'empty.ph':'预留位<br>后续放入新产品图片<br>与编号即可'
+  },
+  en: {
+    'nav.products':'Catalog','nav.new':'New Arrivals','nav.cats':'Categories',
+    'nav.docs':'Documents','nav.gallery':'Gallery','nav.about':'About','nav.contact':'Contact',
+    'hero.title1':'PICANOL','hero.title2':'Air-Jet Loom Parts',
+    'hero.lead':'Yuyao Chaosheng has specialized in PICANOL air-jet loom spare parts since 2000 — PAT-A, DELTA, OMNI, OMNIPLUS, PLUS800, GAMMA, OPTMAX and more. Quality first, reputation first.',
+    'hero.btn1':'Browse Catalog','hero.btn2':'Get a Quote',
+    'stat.s1':'Air-jet loom parts since 2000','stat.s2':'Parts online','stat.s3':'Product categories','stat.s4':'Import substitute · Worldwide',
+    'stat.qr':'Scan for<br>full catalog',
+    'sec.new':'New Arrivals','sec.new_k':'NEW ARRIVALS',
+    'sec.new_d':'Fresh product photos from 2026.09 — more images can be added later.',
+    'sec.cats':'Categories','sec.cats_k':'CATEGORIES',
+    'sec.cats_d':'Browse by loom system; click a card to filter models.',
+    'sec.products':'Product Catalog','sec.products_k':'CATALOG',
+    'sec.docs':'Technical Documents','sec.docs_k':'DOCUMENTS',
+    'sec.docs_d':'Weft accumulator manuals and product catalog — preview or download online.',
+    'sec.gallery':'Photo Gallery','sec.gallery_k':'GALLERY',
+    'sec.gallery_d':'Real product photos — click for a larger view when enquiring.',
+    'sec.about':'About Us','sec.about_k':'COMPANY','sec.profile':'Profile','sec.profile_k':'PROFILE',
+    'sec.contact':'Contact Us','sec.contact_k':'CONTACT',
+    'contact.sub':'Custom drawings, model replacement and bulk supply. Call or leave a message.',
+    'contact.btn1':'Tel','contact.btn2':'Mobile',
+    'footer.add':'ADD: ',
+    'badge.new':'NEW','meta.part':'P/N','meta.mach':'Model','meta.name':'Name','meta.cat':'Category','meta.src':'Source',
+    'btn.preview':'Preview','btn.download':'Download','btn.close':'Close',
+    'filter.all':'All','count.prefix':' items · filter: ',
+    'empty.ph':'Placeholder<br>Add new product image<br>and part number'
+  }
+};
+let lang = localStorage.getItem('cs_lang') || 'zh';
+
+function applyLang(){
+  const dict = I18N[lang];
+  document.documentElement.lang = lang === 'en' ? 'en' : 'zh-CN';
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(dict[k] != null) el.innerHTML = dict[k];
+  });
+  const btn = document.getElementById('langBtn');
+  if(btn){
+    btn.textContent = lang === 'zh' ? 'EN' : '中文';
+    btn.classList.toggle('on', lang === 'en');
+  }
+  // section heads without i18n attrs — map by id
+  const map = [
+    ['#new .section-kicker','sec.new_k'],['#new .section-title','sec.new'],['#new .section-desc','sec.new_d'],
+    ['#categories .section-kicker','sec.cats_k'],['#categories .section-title','sec.cats'],['#categories .section-desc','sec.cats_d'],
+    ['#products .section-kicker','sec.products_k'],['#products .section-title','sec.products'],
+    ['#docs .section-kicker','sec.docs_k'],['#docs .section-title','sec.docs'],['#docs .section-desc','sec.docs_d'],
+    ['#gallery .section-kicker','sec.gallery_k'],['#gallery .section-title','sec.gallery'],['#gallery .section-desc','sec.gallery_d'],
+    ['#about .section-kicker','sec.about_k'],['#about .panel:nth-child(1) h3','sec.about'],
+    ['#about .panel:nth-child(2) h3','sec.profile'],['#about .panel:nth-child(2) .section-kicker','sec.profile_k'],
+    ['#contact .section-kicker','sec.contact_k'],['#contact h3','sec.contact'],['#contact .sub','sec.contact_sub'],
+  ];
+  // simpler explicit ids
+  const byId = {
+    heroT1:'hero.title1', heroT2:'hero.title2', heroLead:'hero.lead',
+    heroB1:'hero.btn1', heroB2:'hero.btn2',
+    st1:'stat.s1', st2:'stat.s2', st3:'stat.s3', st4:'stat.s4',
+    secNewK:'sec.new_k', secNew:'sec.new', secNewD:'sec.new_d',
+    secCatsK:'sec.cats_k', secCats:'sec.cats', secCatsD:'sec.cats_d',
+    secProdK:'sec.products_k', secProd:'sec.products',
+    secDocsK:'sec.docs_k', secDocs:'sec.docs', secDocsD:'sec.docs_d',
+    secGalK:'sec.gallery_k', secGal:'sec.gallery', secGalD:'sec.gallery_d',
+    secAboutK:'sec.about_k', secAbout:'sec.about',
+    secProfK:'sec.profile_k', secProf:'sec.profile',
+    secContactK:'sec.contact_k', secContact:'sec.contact', contactSub:'contact.sub',
+    footAdd:'footer.add', statQr:'stat.qr'
+  };
+  for(const [id,k] of Object.entries(byId)){
+    const el = document.getElementById(id);
+    if(el && dict[k]!=null){
+      if(id==='footAdd'){
+        const addr = lang==='en'
+          ? 'No.16 Xinlvjia Huangjianshan Lizhou St., Yuyao, Zhejiang, China'
+          : '浙江省余姚市梨洲街道黄箭山新吕家16A';
+        el.innerHTML = `<b>${dict[k]}</b>${addr}`;
+      } else {
+        el.innerHTML = dict[k];
+      }
+    }
+  }
+  // rebuild chips with category labels if needed — keep Chinese cat codes internally
+  if(typeof renderChips==='function') renderChips();
+  if(typeof applyFilter==='function') applyFilter();
+}
+
+document.getElementById('langBtn')?.addEventListener('click', ()=>{
+  lang = lang === 'zh' ? 'en' : 'zh';
+  localStorage.setItem('cs_lang', lang);
+  applyLang();
+});
+applyLang();
+
 </script>
 </body>
 </html>
