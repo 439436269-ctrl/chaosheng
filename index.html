@@ -458,6 +458,42 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
   display:block;width:100%;height:min(72vh,820px);border:0;background:#F4F6F7;
 }
 
+/* ===== 产品目录 · 双形态切换（网页 / PDF画册） ===== */
+.head-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.head-right .count-line{margin-bottom:0}
+.view-switch{display:inline-flex;gap:3px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:3px;box-shadow:0 1px 4px rgba(20,40,120,.05)}
+.vs-btn{font-size:12.5px;font-weight:600;letter-spacing:.04em;padding:6px 15px;border-radius:999px;color:var(--sub);transition:color .15s,background .15s,box-shadow .15s;white-space:nowrap}
+.vs-btn:hover{color:var(--blue)}
+.vs-btn.on{background:linear-gradient(90deg,var(--blue-deep),var(--blue));color:#fff;box-shadow:0 2px 8px rgba(4,159,230,.35)}
+.pdf-viewer{display:none;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+#products.pdf-mode .pdf-viewer{display:block}
+#products.pdf-mode #grid,#products.pdf-mode #chips,#products.pdf-mode .count-line{display:none!important}
+.pv-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pv-nav{font-size:13.5px;font-weight:600;color:#fff;background:linear-gradient(90deg,var(--blue-deep),var(--blue));border-radius:8px;padding:8px 16px;transition:transform .15s,opacity .15s}
+.pv-nav:hover{transform:translateY(-1px)}
+.pv-nav:disabled{opacity:.35;cursor:default;transform:none}
+.pv-page{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--sub);letter-spacing:.05em}
+.pv-page input{width:54px;text-align:center;font-size:14px;font-weight:700;color:var(--ink);border:1px solid var(--border);border-radius:6px;padding:5px 4px;font-family:inherit;background:#fff}
+.pv-page input:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.pv-page b{font-weight:700;color:var(--ink)}
+.pv-hint{font-size:12px;color:var(--mute);letter-spacing:.04em}
+.pv-back{font-size:12.5px;font-weight:600;color:var(--sub);background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 15px;white-space:nowrap;transition:color .15s,border-color .15s}
+.pv-back:hover{color:var(--blue);border-color:var(--blue)}
+.pv-open{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--blue-deep);background:var(--blue-soft);border:1px solid #B8CCF0;border-radius:8px;padding:7px 15px;white-space:nowrap;transition:background .15s}
+.pv-open:hover{background:#D6E7FB}
+.pv-stage{display:flex;justify-content:center;padding:16px;background:#EDEFF3;max-height:calc(100vh - 280px);overflow:auto}
+.pv-stage img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);transition:opacity .18s;cursor:pointer;flex:none}
+.pv-stage img.loading{opacity:.2}
+/* 整页 PDF 画册形态：查看器铺满视口，覆盖其余页面内容 */
+body.pdf-page{overflow:hidden}
+body.pdf-page .pdf-viewer{
+  display:flex!important;position:fixed;inset:0;z-index:160;
+  flex-direction:column;border:0;border-radius:0;box-shadow:none;background:#EDEFF3;
+}
+body.pdf-page .pv-bar{flex:0 0 auto;background:#fff;padding:10px 18px}
+body.pdf-page .pv-stage{flex:1 1 auto;min-height:0;max-height:none;align-items:center;overflow:auto}
+body.pdf-page .pv-stage img{max-height:100%;width:auto;object-fit:contain}
+@media (max-width:560px){.pv-hint{display:none}.pv-bar{gap:8px;padding:10px 12px}.pv-nav{padding:7px 12px;font-size:13px}}
 /* ===== Responsive ===== */
 @media (max-width:900px){
   .hero-grid{grid-template-columns:1fr;gap:28px}
@@ -751,10 +787,29 @@ button{font-family:inherit;cursor:pointer;border:none;background:none}
         <h2 class="section-title" id="secProd">产品目录</h2>
         <div class="section-rule"></div>
       </div>
-      <div class="count-line" id="countLabel"></div>
+      <div class="head-right">
+        <div class="count-line" id="countLabel"></div>
+        <div class="view-switch">
+          <button type="button" class="vs-btn on" data-view="grid" data-i18n="view.grid">网页目录</button>
+          <button type="button" class="vs-btn" data-view="pdf" data-i18n="view.pdf">PDF 画册</button>
+        </div>
+      </div>
     </div>
     <div class="filters" id="chips"></div>
     <div class="grid" id="grid"></div>
+    <div class="pdf-viewer" id="pdfView">
+      <div class="pv-bar">
+        <button type="button" class="pv-back" id="pvBack" data-i18n="pdf.back">&lsaquo; 返回网页目录</button>
+        <button type="button" class="pv-nav" id="pvPrev" data-i18n="pdf.prev">‹ 上一页</button>
+        <span class="pv-page"><input id="pvNum" type="text" inputmode="numeric" value="1" aria-label="page number"> / <b id="pvTotal">41</b></span>
+        <button type="button" class="pv-nav" id="pvNext" data-i18n="pdf.next">下一页 ›</button>
+        <span class="pv-hint" data-i18n="pdf.hint">← → 键翻页 · 点图翻页</span>
+        <a class="pv-open" href="assets/docs/catalog-2020.pdf" target="_blank" rel="noopener" data-i18n="pdf.open">打开原始 PDF</a>
+      </div>
+      <div class="pv-stage" id="pvStage">
+        <img id="pvImg" alt="产品画册页面">
+      </div>
+    </div>
   </div>
 </section>
 
@@ -1237,6 +1292,7 @@ const I18N = {
     'badge.new':'新品','meta.part':'件号','meta.mach':'机型','meta.name':'名称','meta.cat':'分类','meta.src':'来源',
     'btn.preview':'在线预览','btn.download':'下载','btn.close':'关闭',
     'filter.all':'全部','count.prefix':'件 · 当前筛选：',
+    'view.grid':'网页目录','view.pdf':'PDF 画册','pdf.prev':'‹ 上一页','pdf.next':'下一页 ›','pdf.hint':'← → 键翻页 · 点图翻页','pdf.open':'打开原始 PDF','pdf.back':'‹ 返回网页目录',
     'empty.ph':'预留位<br>后续放入新产品图片<br>与编号即可'
   },
   en: {
@@ -1264,6 +1320,7 @@ const I18N = {
     'badge.new':'NEW','meta.part':'P/N','meta.mach':'Model','meta.name':'Name','meta.cat':'Category','meta.src':'Source',
     'btn.preview':'Preview','btn.download':'Download','btn.close':'Close',
     'filter.all':'All','count.prefix':' items · filter: ',
+    'view.grid':'Grid View','view.pdf':'PDF Catalog','pdf.prev':'‹ Prev','pdf.next':'Next ›','pdf.hint':'Arrow keys · click image to flip','pdf.open':'Open Original PDF','pdf.back':'‹ Back to Grid',
     'empty.ph':'Placeholder<br>Add new product image<br>and part number'
   }
 };
@@ -1333,5 +1390,77 @@ document.getElementById('langBtn')?.addEventListener('click', ()=>{
 applyLang();
 
 </script>
+<script>
+(function () {
+  var section = document.getElementById('products');
+  if (!section) return;
+  var TOTAL = 41, cur = 1, view = 'grid', started = false;
+  var img = document.getElementById('pvImg');
+  var stage = document.getElementById('pvStage');
+  var numIn = document.getElementById('pvNum');
+  var prev = document.getElementById('pvPrev');
+  var next = document.getElementById('pvNext');
+  document.getElementById('pvTotal').textContent = TOTAL;
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function pageSrc(n) { return 'assets/docs/catalog/page_' + pad(n) + '.jpg'; }
+  function show(n) {
+    n = Math.max(1, Math.min(TOTAL, parseInt(n, 10) || 1));
+    cur = n;
+    var src = pageSrc(n);
+    if (img.getAttribute('src') !== src) {
+      img.classList.add('loading');
+      img.src = src;
+    }
+    if (String(n) !== numIn.value) numIn.value = n;
+    prev.disabled = n <= 1;
+    next.disabled = n >= TOTAL;
+    stage.scrollTop = 0;
+    if (n < TOTAL) { var a = new Image(); a.src = pageSrc(n + 1); }
+    if (n > 1) { var b = new Image(); b.src = pageSrc(n - 1); }
+  }
+  function setView(v) {
+    view = v;
+    try { localStorage.setItem('cs_view', v); } catch (e) {}
+    section.classList.toggle('pdf-mode', v === 'pdf');
+    document.body.classList.toggle('pdf-page', v === 'pdf');
+    var btns = document.querySelectorAll('.vs-btn');
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].classList.toggle('on', btns[i].getAttribute('data-view') === v);
+    }
+    if (v === 'pdf' && !started) { started = true; show(cur); }
+    try { history.replaceState(null, '', v === 'pdf' ? '#pdf' : location.pathname + location.search); } catch (e) {}
+  }
+  var switchBtns = document.querySelectorAll('.vs-btn');
+  for (var bi = 0; bi < switchBtns.length; bi++) {
+    (function (btn) {
+      btn.addEventListener('click', function () { setView(btn.getAttribute('data-view')); });
+    })(switchBtns[bi]);
+  }
+  document.getElementById('pvBack').addEventListener('click', function () { setView('grid'); });
+  img.addEventListener('load', function () { img.classList.remove('loading'); });
+  img.addEventListener('error', function () { img.classList.remove('loading'); });
+  img.addEventListener('click', function () { if (view === 'pdf') show(cur + 1); });
+  prev.addEventListener('click', function () { show(cur - 1); });
+  next.addEventListener('click', function () { show(cur + 1); });
+  numIn.addEventListener('change', function () { show(numIn.value); });
+  numIn.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') { show(numIn.value); numIn.blur(); }
+  });
+  document.addEventListener('keydown', function (e) {
+    if (view !== 'pdf') return;
+    var ae = document.activeElement;
+    if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
+    if (e.key === 'ArrowLeft') { show(cur - 1); e.preventDefault(); }
+    else if (e.key === 'ArrowRight') { show(cur + 1); e.preventDefault(); }
+    else if (e.key === 'Escape') { setView('grid'); }
+  });
+  var init = 'grid';
+  try { init = localStorage.getItem('cs_view') || 'grid'; } catch (e) {}
+  if (location.hash === '#pdf') init = 'pdf';
+  if (location.hash === '#grid') init = 'grid';
+  setView(init);
+})();
+</script>
+
 </body>
 </html>
