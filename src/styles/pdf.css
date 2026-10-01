@@ -1,0 +1,36 @@
+/* ===== 产品目录 · 双形态切换（网页 / PDF画册） ===== */
+.head-right{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.head-right .count-line{margin-bottom:0}
+.view-switch{display:inline-flex;gap:3px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:3px;box-shadow:0 1px 4px rgba(20,40,120,.05)}
+.vs-btn{font-size:12.5px;font-weight:600;letter-spacing:.04em;padding:6px 15px;border-radius:999px;color:var(--sub);transition:color .15s,background .15s,box-shadow .15s;white-space:nowrap}
+.vs-btn:hover{color:var(--blue)}
+.vs-btn.on{background:linear-gradient(90deg,var(--blue-deep),var(--blue));color:#fff;box-shadow:0 2px 8px rgba(4,159,230,.35)}
+.pdf-viewer{display:none;background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+#products.pdf-mode .pdf-viewer{display:block}
+#products.pdf-mode #grid,#products.pdf-mode #chips,#products.pdf-mode .count-line{display:none!important}
+.pv-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.pv-nav{font-size:13.5px;font-weight:600;color:#fff;background:linear-gradient(90deg,var(--blue-deep),var(--blue));border-radius:8px;padding:8px 16px;transition:transform .15s,opacity .15s}
+.pv-nav:hover{transform:translateY(-1px)}
+.pv-nav:disabled{opacity:.35;cursor:default;transform:none}
+.pv-page{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--sub);letter-spacing:.05em}
+.pv-page input{width:54px;text-align:center;font-size:14px;font-weight:700;color:var(--ink);border:1px solid var(--border);border-radius:6px;padding:5px 4px;font-family:inherit;background:#fff}
+.pv-page input:focus{outline:2px solid var(--blue);outline-offset:1px;border-color:var(--blue)}
+.pv-page b{font-weight:700;color:var(--ink)}
+.pv-hint{font-size:12px;color:var(--mute);letter-spacing:.04em}
+.pv-back{font-size:12.5px;font-weight:600;color:var(--sub);background:#fff;border:1px solid var(--border);border-radius:8px;padding:7px 15px;white-space:nowrap;transition:color .15s,border-color .15s}
+.pv-back:hover{color:var(--blue);border-color:var(--blue)}
+.pv-open{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--blue-deep);background:var(--blue-soft);border:1px solid #B8CCF0;border-radius:8px;padding:7px 15px;white-space:nowrap;transition:background .15s}
+.pv-open:hover{background:#D6E7FB}
+.pv-stage{display:flex;justify-content:center;padding:16px;background:#EDEFF3;max-height:calc(100vh - 280px);overflow:auto}
+.pv-stage img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);transition:opacity .18s;cursor:pointer;flex:none}
+.pv-stage img.loading{opacity:.2}
+/* 整页 PDF 画册形态：查看器铺满视口，覆盖其余页面内容 */
+body.pdf-page{overflow:hidden}
+body.pdf-page .pdf-viewer{
+  display:flex!important;position:fixed;inset:0;z-index:160;
+  flex-direction:column;border:0;border-radius:0;box-shadow:none;background:#EDEFF3;
+}
+body.pdf-page .pv-bar{flex:0 0 auto;background:#fff;padding:10px 18px}
+body.pdf-page .pv-stage{flex:1 1 auto;min-height:0;max-height:none;align-items:center;overflow:auto}
+body.pdf-page .pv-stage img{max-height:100%;width:auto;object-fit:contain}
+@media (max-width:560px){.pv-hint{display:none}.pv-bar{gap:8px;padding:10px 12px}.pv-nav{padding:7px 12px;font-size:13px}}

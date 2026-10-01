@@ -1,0 +1,46 @@
+/* docs / PDF */
+.docs-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;
+}
+.doc-card{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px 16px 16px;box-shadow:var(--shadow);
+  display:flex;flex-direction:column;gap:10px;
+  border-left:4px solid var(--blue-deep);
+  transition:transform .2s,box-shadow .2s;
+}
+.doc-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-hover)}
+.doc-card .dtype{
+  font-size:11px;letter-spacing:.16em;color:var(--blue);font-weight:700;
+}
+.doc-card h3{
+  font-size:15px;font-weight:600;line-height:1.45;color:var(--ink);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  min-height:4.2em;
+}
+.doc-card .meta{font-size:12px;color:var(--sub)}
+.doc-card .acts{display:flex;gap:8px;margin-top:auto;flex-wrap:wrap}
+.btn-mini{
+  font-size:12.5px;padding:7px 12px;border-radius:8px;text-decoration:none;
+  background:linear-gradient(90deg,var(--blue-deep),var(--blue));color:#fff;
+  border:1px solid var(--blue-deep);cursor:pointer;font-family:inherit;
+  transition:transform .15s;
+}
+.btn-mini:hover{transform:translateY(-1px)}
+.btn-mini.ghost{background:#fff;color:var(--blue-deep)}
+.docs-preview{
+  margin-top:16px;background:#fff;border:1px solid var(--border);
+  border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);
+}
+.docs-preview[hidden]{display:none}
+.docs-preview-bar{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:10px 14px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-mid));
+  color:#fff;font-size:13px;
+}
+.docs-preview-bar .acts, .docs-preview-bar div{display:flex;gap:8px;align-items:center}
+.docs-preview-bar .btn-mini{background:#fff;color:var(--blue-deep);border-color:#fff}
+.docs-preview-bar .btn-mini.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+.docs-preview iframe{
+  display:block;width:100%;height:min(72vh,820px);border:0;background:#F4F6F7;
+}

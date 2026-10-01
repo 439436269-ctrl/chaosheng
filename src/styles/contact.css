@@ -1,0 +1,19 @@
+/* ===== Contact band ===== */
+.contact-band{
+  background:
+    radial-gradient(ellipse 60% 80% at 90% 30%, rgba(4,159,230,.4), transparent 50%),
+    linear-gradient(100deg,var(--blue-deep),var(--blue-mid) 55%,var(--blue));
+  color:#fff;border-radius:20px;padding:36px 36px;
+  display:grid;grid-template-columns:1.1fr .9fr;gap:28px;align-items:center;
+  box-shadow:0 16px 40px rgba(20,40,120,.2);
+}
+.contact-band h3{font-size:24px;letter-spacing:.1em;margin-bottom:10px}
+.contact-band .sub{font-size:14px;opacity:.9;line-height:1.7;margin-bottom:18px}
+.contact-actions{display:flex;flex-wrap:wrap;gap:10px}
+.info-list{display:grid;gap:10px}
+.info-item{
+  background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);
+  border-radius:12px;padding:12px 14px;font-size:13.5px;line-height:1.55;
+}
+.info-item b{display:block;font-size:11px;letter-spacing:.16em;opacity:.8;margin-bottom:3px;font-weight:500}
+.info-item span{font-weight:500;word-break:break-all}

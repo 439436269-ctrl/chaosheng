@@ -1,0 +1,15 @@
+/* ===== Section shell ===== */
+.section{padding:56px 0}
+.section-head{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:16px;
+  margin-bottom:22px;flex-wrap:wrap;
+}
+.section-kicker{
+  font-size:12px;letter-spacing:.28em;color:var(--blue);font-weight:700;margin-bottom:6px;
+}
+.section-title{font-size:26px;font-weight:700;letter-spacing:.08em;color:var(--ink)}
+.section-desc{font-size:13.5px;color:var(--sub);margin-top:6px;max-width:36em;line-height:1.7}
+.section-rule{
+  height:2px;width:48px;background:linear-gradient(90deg,var(--blue-deep),var(--blue));
+  margin-top:12px;border-radius:2px;
+}

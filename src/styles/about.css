@@ -1,0 +1,21 @@
+/* ===== About ===== */
+.about-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:24px;align-items:start}
+.panel{
+  background:#fff;border:1px solid var(--border);border-radius:var(--radius);
+  padding:28px 28px 24px;box-shadow:var(--shadow);
+}
+.panel h3{font-size:20px;font-weight:700;letter-spacing:.08em;margin-bottom:14px}
+.panel p{font-size:14.5px;line-height:1.9;color:#333;margin-bottom:12px}
+.motto{
+  margin-top:8px;padding:14px 16px;border-radius:10px;
+  background:linear-gradient(90deg,var(--blue-deep),var(--blue));
+  color:#fff;text-align:center;font-size:15px;font-weight:600;letter-spacing:.14em;
+}
+.fact-list{display:flex;flex-direction:column;gap:0}
+.fact{
+  display:grid;grid-template-columns:72px 1fr;gap:10px;
+  padding:12px 0;border-bottom:1px dashed var(--line);font-size:14px;line-height:1.6;
+}
+.fact:last-child{border-bottom:none}
+.fact b{color:var(--blue-deep);font-weight:600}
+.fact span{color:#333}

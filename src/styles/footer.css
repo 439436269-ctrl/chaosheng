@@ -1,0 +1,11 @@
+/* ===== Footer ===== */
+.footer{
+  margin-top:24px;background:linear-gradient(90deg,var(--blue-deep),var(--blue-mid) 50%,var(--blue));
+  color:#fff;padding:18px 0;
+}
+.footer-inner{
+  width:min(var(--max),calc(100% - 40px));margin-inline:auto;
+  display:flex;flex-wrap:wrap;gap:12px;justify-content:space-between;align-items:center;
+  font-size:13px;letter-spacing:.04em;
+}
+.footer-inner b{font-weight:600}
