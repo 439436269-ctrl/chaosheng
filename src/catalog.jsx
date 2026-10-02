@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { PRODUCTS, GALLERY } from './data/products.js';
 import { CAT_ORDER, CAT_DESC, NEW_ARRIVALS, DOCS } from './data/site.js';
 
@@ -9,10 +9,43 @@ export function countOf(cat) {
   return PRODUCTS.filter((p) => p.cat === cat).length;
 }
 
+// 视图初始态：URL hash 优先，其次 localStorage
+function initialView() {
+  try {
+    if (location.hash === '#pdf') return 'pdf';
+    if (location.hash === '#grid') return 'grid';
+    return localStorage.getItem('cs_view') || 'grid';
+  } catch {
+    return 'grid';
+  }
+}
+
 export function CatalogProvider({ children }) {
   const [activeCat, setActiveCat] = useState('全部');
   // 抽屉内容：{kind:'product', product} | {kind:'photo', src} | null
   const [detail, setDetail] = useState(null);
+  // 全局视图模式：grid | pdf（导航栏与产品目录共用）
+  const [view, setViewState] = useState(initialView);
+
+  // 整页画册形态：body class 与 URL hash 同步
+  useEffect(() => {
+    document.body.classList.toggle('pdf-page', view === 'pdf');
+    try {
+      history.replaceState(null, '', view === 'pdf' ? '#pdf' : location.pathname + location.search);
+    } catch {
+      /* ignore */
+    }
+    return () => document.body.classList.remove('pdf-page');
+  }, [view]);
+
+  const setView = useCallback((v) => {
+    setViewState(v);
+    try {
+      localStorage.setItem('cs_view', v);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   const cats = useMemo(() => {
     const seen = new Set(PRODUCTS.map((p) => p.cat));
@@ -49,6 +82,8 @@ export function CatalogProvider({ children }) {
     openProduct,
     openPhoto,
     closeDetail,
+    view,
+    setView,
   };
 
   return <CatalogContext.Provider value={value}>{children}</CatalogContext.Provider>;

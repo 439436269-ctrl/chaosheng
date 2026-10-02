@@ -37,3 +37,9 @@
 }
 .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,0,0,.15)}
 .nav-toggle{display:none;width:40px;height:40px;color:#fff;font-size:20px;border-radius:8px}
+/* 右侧组合：菜单按钮 + 链接 + 全局画册切换 */
+.nav-right{display:flex;align-items:center;gap:12px;min-width:0}
+.nav-vs{flex:none}
+.nav-vs .vs-btn{font-size:12px;padding:5px 12px}
+/* PDF 整页模式下导航栏固定在视口顶端并保持在查看器之上（忽略页首 AI 标注占位） */
+body.pdf-page .nav{position:fixed;top:0;left:0;right:0;z-index:170}

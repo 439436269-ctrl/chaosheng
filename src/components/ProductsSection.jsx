@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useI18n } from '../i18n.jsx';
 import { useCatalog, countOf } from '../catalog.jsx';
 import PdfViewer from './PdfViewer.jsx';
@@ -56,40 +56,10 @@ function Tile({ product, hidden, index, onOpen }) {
   );
 }
 
-function initialView() {
-  try {
-    if (location.hash === '#pdf') return 'pdf';
-    if (location.hash === '#grid') return 'grid';
-    return localStorage.getItem('cs_view') || 'grid';
-  } catch {
-    return 'grid';
-  }
-}
-
 export default function ProductsSection() {
   const { t } = useI18n();
-  const { products, cats, activeCat, setActiveCat, visible, openProduct } = useCatalog();
-  const [view, setView] = useState(initialView);
-
-  // 整页形态：body class 与 URL hash 同步
-  useEffect(() => {
-    document.body.classList.toggle('pdf-page', view === 'pdf');
-    try {
-      history.replaceState(null, '', view === 'pdf' ? '#pdf' : location.pathname + location.search);
-    } catch {
-      /* ignore */
-    }
-    return () => document.body.classList.remove('pdf-page');
-  }, [view]);
-
-  const changeView = (v) => {
-    setView(v);
-    try {
-      localStorage.setItem('cs_view', v);
-    } catch {
-      /* ignore */
-    }
-  };
+  const { products, cats, activeCat, setActiveCat, visible, openProduct, view, setView } =
+    useCatalog();
 
   // 与原站一致：全量渲染 + hide 类过滤（筛选切换不重建 DOM）
   return (
@@ -114,14 +84,14 @@ export default function ProductsSection() {
               <button
                 type="button"
                 className={`vs-btn${view === 'grid' ? ' on' : ''}`}
-                onClick={() => changeView('grid')}
+                onClick={() => setView('grid')}
               >
                 {t('view.grid')}
               </button>
               <button
                 type="button"
                 className={`vs-btn${view === 'pdf' ? ' on' : ''}`}
-                onClick={() => changeView('pdf')}
+                onClick={() => setView('pdf')}
               >
                 {t('view.pdf')}
               </button>
@@ -155,7 +125,7 @@ export default function ProductsSection() {
           ))}
         </div>
 
-        <PdfViewer view={view} onBack={() => changeView('grid')} />
+        <PdfViewer view={view} onBack={() => setView('grid')} />
       </div>
     </section>
   );

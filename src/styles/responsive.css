@@ -22,4 +22,6 @@
   .tile .nm{font-size:13.5px;min-height:0}
   .section{padding:40px 0}
   .section-title{font-size:22px}
+  .nav-vs .vs-btn{font-size:11px;padding:4px 8px}
+  .nav-right{gap:8px}
 }

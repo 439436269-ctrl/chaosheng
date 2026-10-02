@@ -95,10 +95,33 @@ export const DOCS = [
   },
 ];
 
-// PDF 画册总页数与路径模板
-export const CATALOG_PAGES = 41;
-export const catalogPageSrc = (n) =>
-  'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '.jpg';
+// PDF 画册：基础 41 页，后续新品页按顺序追加即可（图片放 assets/docs/catalog/）
+// 例：{ title: '新品推荐 2026.10', src: 'assets/docs/catalog/new_2026_10.jpg' }
+export const CATALOG_BASE_PAGES = 41;
+export const EXTRA_CATALOG_PAGES = [];
+export const CATALOG_PAGES = CATALOG_BASE_PAGES + EXTRA_CATALOG_PAGES.length;
+
+export function catalogPageSrc(n) {
+  if (n <= CATALOG_BASE_PAGES) {
+    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '.jpg';
+  }
+  const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
+  return extra ? extra.src : '';
+}
+
+// 跨页规则（2026-10 确认）：01 封面单页，02–37 两两合并，38 之后单页
+export function buildSpreadViews() {
+  const spreadEnd = Math.min(37, CATALOG_PAGES);
+  const views = [[1]];
+  for (let p = 2; p + 1 <= spreadEnd; p += 2) views.push([p, p + 1]);
+  for (let p = spreadEnd + 1; p <= CATALOG_PAGES; p++) views.push([p]);
+  return views;
+}
+
+// 窄屏回落：逐页展示
+export function buildSingleViews() {
+  return Array.from({ length: CATALOG_PAGES }, (_, i) => [i + 1]);
+}
 
 export const CONTACT = {
   tel: '0574-62561851',

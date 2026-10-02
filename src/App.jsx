@@ -17,19 +17,7 @@ function Site() {
   const { pickCat } = useCatalog();
   return (
     <>
-      {/* AI 生成内容标注（合规标记，勿删） */}
-      <p
-        data-aigc-mark="1"
-        style={{
-          margin: '0 0 8px',
-          fontSize: '10px',
-          lineHeight: 1.3,
-          color: '#6b6560',
-          fontWeight: 400,
-        }}
-      >
-        AI生成
-      </p>
+      {/* AI 生成标注位于 index.html body 顶部（静态，首屏即显），此处勿重复添加 */}
       <Nav />
       <Hero />
       <NewArrivals />
