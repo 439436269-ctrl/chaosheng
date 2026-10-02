@@ -118,11 +118,6 @@ export function buildSpreadViews() {
   return views;
 }
 
-// 窄屏回落：逐页展示
-export function buildSingleViews() {
-  return Array.from({ length: CATALOG_PAGES }, (_, i) => [i + 1]);
-}
-
 export const CONTACT = {
   tel: '0574-62561851',
   mobile: '13605846068',

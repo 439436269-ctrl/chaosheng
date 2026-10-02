@@ -9,15 +9,15 @@ export function countOf(cat) {
   return PRODUCTS.filter((p) => p.cat === cat).length;
 }
 
-// 视图初始态：URL hash 优先，其次 localStorage
+// 视图初始态：默认 PDF 画册展示；URL hash 可强制指定（#grid 进入网页目录）
 function initialView() {
   try {
-    if (location.hash === '#pdf') return 'pdf';
     if (location.hash === '#grid') return 'grid';
-    return localStorage.getItem('cs_view') || 'grid';
+    if (location.hash === '#pdf') return 'pdf';
   } catch {
-    return 'grid';
+    /* ignore */
   }
+  return 'pdf';
 }
 
 export function CatalogProvider({ children }) {
@@ -40,11 +40,6 @@ export function CatalogProvider({ children }) {
 
   const setView = useCallback((v) => {
     setViewState(v);
-    try {
-      localStorage.setItem('cs_view', v);
-    } catch {
-      /* ignore */
-    }
   }, []);
 
   const cats = useMemo(() => {

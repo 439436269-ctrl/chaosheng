@@ -1,41 +1,24 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../i18n.jsx';
-import {
-  CATALOG_PAGES,
-  catalogPageSrc,
-  buildSpreadViews,
-  buildSingleViews,
-} from '../data/site.js';
-
-const WIDE_QUERY = '(min-width: 900px)';
+import { CATALOG_PAGES, catalogPageSrc, buildSpreadViews } from '../data/site.js';
 
 /**
  * PDF 画册查看器（跨页版）。
- * - 宽屏：01 封面单页，02–37 两两合并（跨页产品图完整展示），38+ 单页
- * - 窄屏：逐页展示
+ * - 全端统一视图：01 封面单页，02–37 两两合并（36–37 亦合并），38+ 单页
+ * - 布局自适应：宽屏两页并排，窄屏（手机竖屏）同视图上下堆叠，CSS 控制
  * - 整页形态由 body.pdf-page + styles/pdf.css 控制；导航栏保持在查看器之上
  * - 支持：上一页/下一页（按视图步进）、页码跳转、← → 键、点图翻页、Esc 返回
  */
 export default function PdfViewer({ view, onBack }) {
   const { t } = useI18n();
-  const [wide, setWide] = useState(
-    () => typeof window !== 'undefined' && window.matchMedia(WIDE_QUERY).matches,
-  );
   const [page, setPage] = useState(1); // 当前视图首页页码
   const [numText, setNumText] = useState('1');
   const [loading, setLoading] = useState({});
   const [started, setStarted] = useState(false);
   const stageRef = useRef(null);
 
-  useEffect(() => {
-    const mq = window.matchMedia(WIDE_QUERY);
-    const on = (e) => setWide(e.matches);
-    mq.addEventListener('change', on);
-    return () => mq.removeEventListener('change', on);
-  }, []);
-
-  // 视图列表：宽屏跨页 / 窄屏单页
-  const views = useMemo(() => (wide ? buildSpreadViews() : buildSingleViews()), [wide]);
+  // 视图列表：全端统一跨页（36–37 等两两合并），布局交由 CSS 自适应
+  const views = useMemo(() => buildSpreadViews(), []);
 
   // 当前视图索引（page 可能落在跨页视图中间，取包含它的视图）
   const idx = Math.max(
@@ -44,14 +27,6 @@ export default function PdfViewer({ view, onBack }) {
   );
   const current = views[idx];
   const isSpread = current.length > 1;
-
-  // 视口宽度切换时，保持停留在同一页
-  useEffect(() => {
-    setPage((p) => {
-      const found = views.find((v) => v.includes(p));
-      return found ? found[0] : p;
-    });
-  }, [views]);
 
   const showView = (i) => {
     const next = Math.max(0, Math.min(views.length - 1, i));

@@ -25,8 +25,10 @@
 .pv-stage{display:flex;justify-content:center;align-items:flex-start;gap:14px;padding:16px;background:#EDEFF3;max-height:calc(100vh - 280px);overflow:auto}
 .pv-stage img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);transition:opacity .18s;cursor:pointer;flex:none}
 .pv-stage img.loading{opacity:.2}
-/* 跨页展示：当前视图含两页时并排（02–37 两两合并） */
-.pv-stage.spread img{max-width:calc((100% - 14px) / 2)}
+/* 跨页布局：窄屏（手机竖/横屏）两页上下堆叠，同一视图内滚动查看 */
+.pv-stage.spread{flex-direction:column;align-items:center;justify-content:flex-start}
+.pv-stage.spread img{max-width:100%}
+body.pdf-page .pv-stage.spread img{max-height:none;width:auto}
 /* 整页 PDF 画册形态：查看器铺满视口（导航栏之下），覆盖其余页面内容 */
 body.pdf-page{overflow:hidden}
 body.pdf-page .pdf-viewer{
@@ -36,5 +38,14 @@ body.pdf-page .pdf-viewer{
 body.pdf-page .pv-bar{flex:0 0 auto;background:#fff;padding:10px 18px}
 body.pdf-page .pv-stage{flex:1 1 auto;min-height:0;max-height:none;align-items:center;overflow:auto}
 body.pdf-page .pv-stage img{max-height:100%;width:auto;object-fit:contain}
-body.pdf-page .pv-stage.spread img{max-width:calc((100% - 14px) / 2)}
+/* 手机（<900px）：不限高，按宽度铺满后纵向滚动，保证可读性 */
+@media (max-width:899px){
+  body.pdf-page .pv-stage img{max-height:none;max-width:100%}
+}
+/* ≥900px：两页并排 */
+@media (min-width:900px){
+  .pv-stage.spread{flex-direction:row;justify-content:center}
+  .pv-stage.spread img{max-width:calc((100% - 14px) / 2)}
+  body.pdf-page .pv-stage.spread img{max-height:100%;max-width:calc((100% - 14px) / 2)}
+}
 @media (max-width:560px){.pv-hint{display:none}.pv-bar{gap:8px;padding:10px 12px}.pv-nav{padding:7px 12px;font-size:13px}}
