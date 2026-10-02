@@ -3,7 +3,7 @@ import { useCatalog } from '../catalog.jsx';
 
 export default function NewArrivals() {
   const { t } = useI18n();
-  const { news } = useCatalog();
+  const { news, view } = useCatalog();
 
   return (
     <section className="section" id="new">
@@ -20,12 +20,15 @@ export default function NewArrivals() {
           {news.map((s, i) => (
             <article className="new-card" key={s.code}>
               <div className="imgwrap">
-                <img
-                  src={s.img}
-                  alt={s.name}
-                  loading={i < 4 ? undefined : 'lazy'}
-                  decoding="async"
-                />
+                {/* PDF 画册模式下挂起新品图，切回网页目录再加载，避免与画册抢带宽 */}
+                {view === 'grid' && (
+                  <img
+                    src={s.img}
+                    alt={s.name}
+                    loading={i < 4 ? undefined : 'lazy'}
+                    decoding="async"
+                  />
+                )}
               </div>
               <div className="body">
                 <span className="badge">NEW</span>

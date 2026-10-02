@@ -21,7 +21,7 @@ export default function Nav() {
     <header className="nav">
       <div className="nav-inner">
         <a className="brand" href="#top" onClick={() => setOpen(false)}>
-          <img src="assets/logo.png" alt="超盛纺配" />
+          <img src="assets/logo.webp" alt="超盛纺配" />
           <div className="t">
             <b>超盛纺配</b>
             <span>CHAOSHENG·TEXTILE</span>

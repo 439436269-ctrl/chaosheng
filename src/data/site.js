@@ -101,9 +101,19 @@ export const CATALOG_BASE_PAGES = 41;
 export const EXTRA_CATALOG_PAGES = [];
 export const CATALOG_PAGES = CATALOG_BASE_PAGES + EXTRA_CATALOG_PAGES.length;
 
+// 放大原图：2380px WebP q90（约 200KB，同分辨率 JPEG 的 40%），仅点放大时加载
 export function catalogPageSrc(n) {
   if (n <= CATALOG_BASE_PAGES) {
-    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '.jpg';
+    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '_z.webp';
+  }
+  const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
+  return extra ? extra.src : '';
+}
+
+// 中间档：952px WebP（约 50KB），srcset 给 DPR1 屏用
+export function catalogMidSrc(n) {
+  if (n <= CATALOG_BASE_PAGES) {
+    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '_m.webp';
   }
   const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
   return extra ? extra.src : '';

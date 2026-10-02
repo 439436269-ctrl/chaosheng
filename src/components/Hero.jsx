@@ -3,7 +3,7 @@ import { useCatalog } from '../catalog.jsx';
 
 export default function Hero() {
   const { t } = useI18n();
-  const { products, cats } = useCatalog();
+  const { products, cats, view } = useCatalog();
   const catCount = cats.length - 1; // 不含「全部」
 
   return (
@@ -45,7 +45,9 @@ export default function Hero() {
           </div>
           <div className="stat stat-qr">
             <div className="qr-row">
-              <img src="assets/qrcode_site.png" alt="QR" loading="lazy" />
+              {view === 'grid' && (
+            <img src="assets/qrcode_site.png" alt="QR" loading="lazy" />
+          )}
               {/* eslint-disable-next-line react/no-danger -- i18n 文案含 <br> 换行 */}
               <span dangerouslySetInnerHTML={{ __html: t('stat.qr') }} />
             </div>

@@ -4,6 +4,7 @@ import {
   CATALOG_PAGES,
   catalogPageSrc,
   catalogDisplaySrc,
+  catalogMidSrc,
   buildSpreadViews,
 } from '../data/site.js';
 
@@ -18,14 +19,17 @@ function PageZoom({ displaySrc, fullSrc, label, onClose }) {
   const { t } = useI18n();
   const [vt, setVt] = useState({ s: 1, x: 0, y: 0 });
   const [fullReady, setFullReady] = useState(false);
+  const [fullFailed, setFullFailed] = useState(false);
 
   // 显示层秒开，全尺寸原图后台加载完成后无闪烁叠加替换
   useEffect(() => {
     const im = new Image();
     im.onload = () => setFullReady(true);
+    im.onerror = () => setFullFailed(true);
     im.src = fullSrc;
     return () => {
       im.onload = null;
+      im.onerror = null;
       im.src = '';
     };
   }, [fullSrc]);
@@ -149,6 +153,10 @@ function PageZoom({ displaySrc, fullSrc, label, onClose }) {
         )}
       </div>
       <span className="pv-zoom-label">{label}</span>
+      {!fullReady && !fullFailed && (
+        <span className="pv-zoom-badge">{t('pdf.zoom.loading')}</span>
+      )}
+      {fullFailed && <span className="pv-zoom-badge">{t('pdf.zoom.failed')}</span>}
       <div className="pv-zoom-tools">
         <button type="button" onClick={() => step(1.3)} aria-label="zoom in">
           ＋
@@ -206,7 +214,10 @@ export default function PdfViewer({ view, onBack }) {
     // 取消不再属于当前邻居的在途预载
     const alive = new Set();
     [idx - 1, idx, idx + 1].forEach((j) =>
-      (views[j] || []).forEach((n) => alive.add(catalogDisplaySrc(n))),
+      (views[j] || []).forEach((n) => {
+        alive.add(catalogDisplaySrc(n));
+        alive.add(catalogMidSrc(n));
+      }),
     );
     preloadRef.current.forEach((im, s) => {
       if (!alive.has(s)) {
@@ -220,10 +231,12 @@ export default function PdfViewer({ view, onBack }) {
     const allLoaded = current.every((n) => loaded[catalogDisplaySrc(n)]);
     if (!allLoaded) return undefined;
     const timer = setTimeout(() => {
+      // 按设备像素比选择预载档位：DPR1 用 952px 中间档，高分屏用 1488px
+      const midPreferred = (window.devicePixelRatio || 1) < 1.5;
       [idx - 1, idx + 1].forEach((j) =>
         (views[j] || []).forEach((n) => {
-          const s = catalogDisplaySrc(n);
-          if (loaded[s] || preloadRef.current.has(s)) return;
+          const s = midPreferred ? catalogMidSrc(n) : catalogDisplaySrc(n);
+          if (preloadRef.current.has(s) || loaded[catalogDisplaySrc(n)]) return;
           const im = new Image();
           try {
             im.fetchPriority = 'low';
@@ -371,6 +384,8 @@ export default function PdfViewer({ view, onBack }) {
                 key={src}
                 alt={`产品画册第 ${n} 页`}
                 src={src}
+                srcSet={`${catalogMidSrc(n)} 952w, ${src} 1488w`}
+                sizes="(max-width:899px) 100vw, 50vw"
                 fetchPriority="high"
                 decoding="async"
                 // 显示层小图直接显示，秒开

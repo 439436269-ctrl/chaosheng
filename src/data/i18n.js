@@ -27,6 +27,7 @@ export const I18N = {
     'filter.all': '全部', 'count.prefix': '件 · 当前筛选：',
     'view.grid': '网页目录', 'view.pdf': 'PDF 画册', 'pdf.prev': '‹ 上一页', 'pdf.next': '下一页 ›',
     'pdf.hint': '‹ › 按钮 · ← → 键翻页', 'pdf.open': '打开原始 PDF', 'pdf.back': '‹ 返回网页目录', 'pdf.zoom.hint': '滚轮/双指缩放 · 拖动平移 · 点图放大或还原 · ✕ 关闭',
+    'pdf.zoom.loading': '高清原图加载中…', 'pdf.zoom.failed': '原图加载失败，已显示标清图',
     'empty.ph': '预留位<br>后续放入新产品图片<br>与编号即可',
   },
   en: {
@@ -56,6 +57,7 @@ export const I18N = {
     'filter.all': 'All', 'count.prefix': ' items · filter: ',
     'view.grid': 'Grid View', 'view.pdf': 'PDF Catalog', 'pdf.prev': '‹ Prev', 'pdf.next': 'Next ›',
     'pdf.hint': '‹ › buttons · Arrow keys to flip', 'pdf.open': 'Open Original PDF', 'pdf.back': '‹ Back to Grid', 'pdf.zoom.hint': 'Scroll/pinch to zoom · drag to pan · click image to fit · ✕ close',
+    'pdf.zoom.loading': 'Loading full-res image…', 'pdf.zoom.failed': 'Full-res failed, showing preview',
     'empty.ph': 'Placeholder<br>Add new product image<br>and part number',
   },
 };

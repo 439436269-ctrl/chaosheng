@@ -71,6 +71,14 @@
 }
 .pv-zoom-tools button:hover{background:rgba(255,255,255,.3)}
 .pv-zoom-close{font-size:20px !important}
+.pv-zoom-badge{
+  position:absolute;left:50%;top:56px;transform:translateX(-50%);z-index:2;
+  color:#FFE08A;font-size:13px;letter-spacing:.06em;
+  background:rgba(0,0,0,.55);border:1px solid rgba(255,224,138,.4);
+  border-radius:999px;padding:7px 18px;
+  animation:pv-badge-pulse 1.2s ease-in-out infinite;
+}
+@keyframes pv-badge-pulse{0%,100%{opacity:1}50%{opacity:.5}}
 .pv-zoom-hint{
   position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:2;
   color:rgba(255,255,255,.75);font-size:12.5px;letter-spacing:.05em;
