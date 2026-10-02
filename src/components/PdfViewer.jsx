@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../i18n.jsx';
-import { CATALOG_PAGES, catalogPageSrc, buildSpreadViews } from '../data/site.js';
+import {
+  CATALOG_PAGES,
+  catalogPageSrc,
+  catalogDisplaySrc,
+  buildSpreadViews,
+} from '../data/site.js';
 
 const clampScale = (s) => Math.min(4, Math.max(0.5, s));
 
@@ -9,9 +14,21 @@ const clampScale = (s) => Math.min(4, Math.max(0.5, s));
  * - 滚轮/双指缩放（以指针为锚点）、拖拽平移
  * - 点图片：fit ↔ 1.6 倍切换；点空白/✕/Esc 关闭
  */
-function PageZoom({ src, label, onClose }) {
+function PageZoom({ displaySrc, fullSrc, label, onClose }) {
   const { t } = useI18n();
   const [vt, setVt] = useState({ s: 1, x: 0, y: 0 });
+  const [fullReady, setFullReady] = useState(false);
+
+  // 显示层秒开，全尺寸原图后台加载完成后无闪烁叠加替换
+  useEffect(() => {
+    const im = new Image();
+    im.onload = () => setFullReady(true);
+    im.src = fullSrc;
+    return () => {
+      im.onload = null;
+      im.src = '';
+    };
+  }, [fullSrc]);
   const wrapRef = useRef(null);
   const ptsRef = useRef(new Map());
   const lastDistRef = useRef(null);
@@ -122,14 +139,15 @@ function PageZoom({ src, label, onClose }) {
       onPointerCancel={onPointerUp}
       onContextMenu={(e) => e.preventDefault()}
     >
-      <img
-        src={src}
-        alt={label}
-        draggable={false}
-        style={{
-          transform: `translate(${vt.x}px, ${vt.y}px) scale(${vt.s})`,
-        }}
-      />
+      <div
+        className="pv-zoom-inner"
+        style={{ transform: `translate(${vt.x}px, ${vt.y}px) scale(${vt.s})` }}
+      >
+        <img className="pv-zoom-base" src={displaySrc} alt={label} draggable={false} />
+        {fullReady && (
+          <img className="pv-zoom-full" src={fullSrc} alt="" draggable={false} />
+        )}
+      </div>
       <span className="pv-zoom-label">{label}</span>
       <div className="pv-zoom-tools">
         <button type="button" onClick={() => step(1.3)} aria-label="zoom in">
@@ -153,7 +171,8 @@ function PageZoom({ src, label, onClose }) {
 /**
  * PDF 画册查看器（跨页版）。
  * - 全端统一视图：01 封面单页，02–37 两两合并（36–37 亦合并），38+ 单页
- * - 加载策略：当前视图 fetchpriority=high 优先；相邻视图待当前全部加载完再低优先预载
+ * - 加载策略：stage 用显示层小图（约 1/6 体积）fetchpriority=high 秒开；
+ *   相邻视图显示层待当前加载完再低优先预载，翻页自动取消过期预载；原图仅放大时加载
  * - stage 两侧大翻页按钮；点图片进入全屏放大（不再是翻页）
  */
 export default function PdfViewer({ view, onBack }) {
@@ -178,28 +197,58 @@ export default function PdfViewer({ view, onBack }) {
 
   const markLoaded = (src) => setLoaded((m) => (m[src] ? m : { ...m, [src]: true }));
 
-  // 当前视图全部加载完成后，再低优先预载相邻视图（带宽优先当前页）
+  // 在途预载表：翻页时可取消，防止过期请求堆积占满带宽（响应截图中的队列问题）
+  const preloadRef = useRef(new Map());
+
+  // 当前视图（显示层）全部加载完后，才低优先预载相邻视图；视图切换即取消旧预载
   useEffect(() => {
     if (!started) return undefined;
-    const allLoaded = current.every((n) => loaded[catalogPageSrc(n)]);
+    // 取消不再属于当前邻居的在途预载
+    const alive = new Set();
+    [idx - 1, idx, idx + 1].forEach((j) =>
+      (views[j] || []).forEach((n) => alive.add(catalogDisplaySrc(n))),
+    );
+    preloadRef.current.forEach((im, s) => {
+      if (!alive.has(s)) {
+        im.onload = null;
+        im.onerror = null;
+        im.src = ''; // 中止下载
+        preloadRef.current.delete(s);
+      }
+    });
+
+    const allLoaded = current.every((n) => loaded[catalogDisplaySrc(n)]);
     if (!allLoaded) return undefined;
     const timer = setTimeout(() => {
       [idx - 1, idx + 1].forEach((j) =>
         (views[j] || []).forEach((n) => {
-          const s = catalogPageSrc(n);
-          if (loaded[s]) return;
+          const s = catalogDisplaySrc(n);
+          if (loaded[s] || preloadRef.current.has(s)) return;
           const im = new Image();
           try {
             im.fetchPriority = 'low';
           } catch {
             /* ignore */
           }
+          im.onload = () => preloadRef.current.delete(s);
+          im.onerror = () => preloadRef.current.delete(s);
           im.src = s;
+          preloadRef.current.set(s, im);
         }),
       );
     }, 150);
     return () => clearTimeout(timer);
   }, [started, idx, views, current, loaded]);
+
+  // 卸载时清空全部在途预载
+  useEffect(() => () => {
+    preloadRef.current.forEach((im) => {
+      im.onload = null;
+      im.onerror = null;
+      im.src = '';
+    });
+    preloadRef.current.clear();
+  }, []);
 
   const showView = (i) => {
     const next = Math.max(0, Math.min(views.length - 1, i));
@@ -252,7 +301,8 @@ export default function PdfViewer({ view, onBack }) {
     return () => document.removeEventListener('keydown', onKey);
   }, [view, zoom, idx, views]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const srcs = started ? current.map((n) => ({ n, src: catalogPageSrc(n) })) : [];
+  // stage 用显示层小图（118KB 均值，全尺寸 1/6），点放大才加载原图
+  const srcs = started ? current.map((n) => ({ n, src: catalogDisplaySrc(n) })) : [];
 
   return (
     <>
@@ -323,13 +373,20 @@ export default function PdfViewer({ view, onBack }) {
                 src={src}
                 fetchPriority="high"
                 decoding="async"
-                // 渐进式 JPEG 直接显示（不再等 load 才可见），边下载边渲染
+                // 显示层小图直接显示，秒开
                 ref={(el) => {
                   if (el && el.complete && el.naturalWidth > 0) markLoaded(src);
                 }}
                 onLoad={() => markLoaded(src)}
                 onError={() => markLoaded(src)}
-                onClick={() => view === 'pdf' && setZoom({ src, label: `${n} / ${CATALOG_PAGES}` })}
+                onClick={() =>
+                  view === 'pdf' &&
+                  setZoom({
+                    displaySrc: catalogDisplaySrc(n),
+                    fullSrc: catalogPageSrc(n),
+                    label: `${n} / ${CATALOG_PAGES}`,
+                  })
+                }
               />
             ))}
           </div>
@@ -344,7 +401,14 @@ export default function PdfViewer({ view, onBack }) {
           </button>
         </div>
       </div>
-      {zoom && <PageZoom src={zoom.src} label={zoom.label} onClose={() => setZoom(null)} />}
+      {zoom && (
+        <PageZoom
+          displaySrc={zoom.displaySrc}
+          fullSrc={zoom.fullSrc}
+          label={zoom.label}
+          onClose={() => setZoom(null)}
+        />
+      )}
     </>
   );
 }

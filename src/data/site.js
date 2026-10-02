@@ -109,6 +109,15 @@ export function catalogPageSrc(n) {
   return extra ? extra.src : '';
 }
 
+// 显示层：1488px WebP（均 118KB，全尺寸的 1/6），stage 默认用它；点放大才加载全尺寸
+export function catalogDisplaySrc(n) {
+  if (n <= CATALOG_BASE_PAGES) {
+    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '_d.webp';
+  }
+  const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
+  return extra ? extra.src : '';
+}
+
 // 跨页规则（2026-10 确认）：01 封面单页，02–37 两两合并，38 之后单页
 export function buildSpreadViews() {
   const spreadEnd = Math.min(37, CATALOG_PAGES);
