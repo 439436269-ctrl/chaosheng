@@ -42,8 +42,8 @@ public/assets/        静态资源（图片、PDF）
 
 ## 关键交互
 
-- **全局切换**：导航栏右侧「网页目录 / PDF 画册」胶囊切换器（Nav.jsx 的 .nav-vs），任意位置可进入画册；产品目录标题旁的切换器与之联动（状态在 catalog.jsx 上下文）。
-- **跨页画册**：宽屏（≥900px）下 01 封面单页、02–37 两两合并展示跨页产品图、38 之后单页；窄屏自动回落逐页。规则在 src/data/site.js 的 uildSpreadViews()。
+- **全局切换**：仅导航栏右侧「网页目录 / PDF 画册」胶囊切换器（Nav.jsx 的 .nav-vs），任意位置可进入画册；状态在 catalog.jsx 上下文。
+- **跨页画册**：宽屏（≥900px）下 01 封面单页、02–37 两两合并展示跨页产品图（含 36–37）、38 之后单页；窄屏自动回落逐页。规则在 src/data/site.js 的 uildSpreadViews()。画册页以 scale=4（2380×3368）自 PDF 重渲染保证 HiDPI 清晰度。
 - **整页形态**：ody.pdf-page 下查看器铺满视口（导航之下），导航固定置顶保持可切换；Esc 或「返回网页目录」退出；选择记入 localStorage.cs_view 与 URL #pdf。
 - **后续新品页**：向 src/data/site.js 的 EXTRA_CATALOG_PAGES 数组追加 { title, src } 即自动进入画册尾页。
 - 中英切换：右上角按钮，记入 `localStorage.cs_lang`。

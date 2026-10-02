@@ -80,22 +80,6 @@ export default function ProductsSection() {
               {visible.length} {t('count.prefix')}
               {activeCat}
             </div>
-            <div className="view-switch">
-              <button
-                type="button"
-                className={`vs-btn${view === 'grid' ? ' on' : ''}`}
-                onClick={() => setView('grid')}
-              >
-                {t('view.grid')}
-              </button>
-              <button
-                type="button"
-                className={`vs-btn${view === 'pdf' ? ' on' : ''}`}
-                onClick={() => setView('pdf')}
-              >
-                {t('view.pdf')}
-              </button>
-            </div>
           </div>
         </div>
 
