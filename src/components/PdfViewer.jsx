@@ -2,19 +2,167 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useI18n } from '../i18n.jsx';
 import { CATALOG_PAGES, catalogPageSrc, buildSpreadViews } from '../data/site.js';
 
+const clampScale = (s) => Math.min(4, Math.max(0.5, s));
+
+/**
+ * 全屏放大查看器：
+ * - 滚轮/双指缩放（以指针为锚点）、拖拽平移
+ * - 点图片：fit ↔ 1.6 倍切换；点空白/✕/Esc 关闭
+ */
+function PageZoom({ src, label, onClose }) {
+  const { t } = useI18n();
+  const [vt, setVt] = useState({ s: 1, x: 0, y: 0 });
+  const wrapRef = useRef(null);
+  const ptsRef = useRef(new Map());
+  const lastDistRef = useRef(null);
+  const dragRef = useRef(null);
+  const movedRef = useRef(false);
+
+  // 滚轮缩放（非 passive，阻止页面滚动）
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return undefined;
+    const onWheel = (e) => {
+      e.preventDefault();
+      const rect = el.getBoundingClientRect();
+      const px = e.clientX - rect.left - rect.width / 2;
+      const py = e.clientY - rect.top - rect.height / 2;
+      const f = Math.exp(-e.deltaY * 0.0016);
+      setVt((v) => {
+        const ns = Math.min(4, Math.max(0.5, v.s * f));
+        const eff = ns / v.s;
+        // 保持指针下的点不动
+        return { s: ns, x: px - (px - v.x) * eff, y: py - (py - v.y) * eff };
+      });
+    };
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
+
+  const step = (k) => setVt((v) => ({ ...v, s: Math.min(4, Math.max(0.5, v.s * k)) }));
+
+  const onPointerDown = (e) => {
+    if (e.target.closest('button')) return;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    ptsRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    movedRef.current = false;
+    if (ptsRef.current.size === 2) {
+      const [a, b] = [...ptsRef.current.values()];
+      lastDistRef.current = Math.hypot(a.x - b.x, a.y - b.y);
+      dragRef.current = null;
+    } else if (ptsRef.current.size === 1) {
+      dragRef.current = {
+        x0: e.clientX,
+        y0: e.clientY,
+        tx0: vt.x,
+        ty0: vt.y,
+        onImg: e.target.tagName === 'IMG',
+      };
+    }
+  };
+
+  const onPointerMove = (e) => {
+    const pts = ptsRef.current;
+    if (!pts.has(e.pointerId)) return;
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (pts.size >= 2) {
+      const [a, b] = [...pts.values()];
+      const nd = Math.hypot(a.x - b.x, a.y - b.y);
+      if (lastDistRef.current) {
+        const rect = wrapRef.current.getBoundingClientRect();
+        const cx = (a.x + b.x) / 2 - rect.left - rect.width / 2;
+        const cy = (a.y + b.y) / 2 - rect.top - rect.height / 2;
+        const f = nd / lastDistRef.current;
+        setVt((v) => {
+          const ns = Math.min(4, Math.max(0.5, v.s * f));
+          const eff = ns / v.s;
+          return { s: ns, x: cx - (cx - v.x) * eff, y: cy - (cy - v.y) * eff };
+        });
+        lastDistRef.current = nd;
+      }
+      movedRef.current = true;
+      return;
+    }
+
+    const d = dragRef.current;
+    if (d) {
+      const dx = e.clientX - d.x0;
+      const dy = e.clientY - d.y0;
+      if (Math.abs(dx) + Math.abs(dy) > 5) movedRef.current = true;
+      setVt((v) => ({ ...v, x: d.tx0 + dx, y: d.ty0 + dy }));
+    }
+  };
+
+  const onPointerUp = (e) => {
+    const pts = ptsRef.current;
+    pts.delete(e.pointerId);
+    if (pts.size < 2) lastDistRef.current = null;
+    if (pts.size === 0) {
+      const d = dragRef.current;
+      if (d && !movedRef.current && !e.target.closest('button')) {
+        if (d.onImg) {
+          // 点图片：fit ↔ 放大
+          setVt((v) => (v.s > 1.05 ? { s: 1, x: 0, y: 0 } : { s: 1.6, x: 0, y: 0 }));
+        } else {
+          onClose();
+        }
+      }
+      dragRef.current = null;
+    }
+  };
+
+  return (
+    <div
+      ref={wrapRef}
+      className="pv-zoom"
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerCancel={onPointerUp}
+      onContextMenu={(e) => e.preventDefault()}
+    >
+      <img
+        src={src}
+        alt={label}
+        draggable={false}
+        style={{
+          transform: `translate(${vt.x}px, ${vt.y}px) scale(${vt.s})`,
+        }}
+      />
+      <span className="pv-zoom-label">{label}</span>
+      <div className="pv-zoom-tools">
+        <button type="button" onClick={() => step(1.3)} aria-label="zoom in">
+          ＋
+        </button>
+        <button type="button" onClick={() => step(1 / 1.3)} aria-label="zoom out">
+          －
+        </button>
+        <button type="button" onClick={() => setVt({ s: 1, x: 0, y: 0 })} aria-label="reset">
+          ⟲
+        </button>
+        <button type="button" className="pv-zoom-close" onClick={onClose} aria-label="close">
+          ✕
+        </button>
+      </div>
+      <span className="pv-zoom-hint">{t('pdf.zoom.hint')}</span>
+    </div>
+  );
+}
+
 /**
  * PDF 画册查看器（跨页版）。
  * - 全端统一视图：01 封面单页，02–37 两两合并（36–37 亦合并），38+ 单页
- * - 布局自适应：宽屏两页并排，窄屏（手机竖屏）同视图上下堆叠，CSS 控制
- * - 整页形态由 body.pdf-page + styles/pdf.css 控制；导航栏保持在查看器之上
- * - 支持：上一页/下一页（按视图步进）、页码跳转、← → 键、点图翻页、Esc 返回
+ * - 加载策略：当前视图 fetchpriority=high 优先；相邻视图待当前全部加载完再低优先预载
+ * - stage 两侧大翻页按钮；点图片进入全屏放大（不再是翻页）
  */
 export default function PdfViewer({ view, onBack }) {
   const { t } = useI18n();
   const [page, setPage] = useState(1); // 当前视图首页页码
   const [numText, setNumText] = useState('1');
-  const [loading, setLoading] = useState({});
+  const [loaded, setLoaded] = useState({});
   const [started, setStarted] = useState(false);
+  const [zoom, setZoom] = useState(null); // {src, label}
   const stageRef = useRef(null);
 
   // 视图列表：全端统一跨页（36–37 等两两合并），布局交由 CSS 自适应
@@ -28,18 +176,37 @@ export default function PdfViewer({ view, onBack }) {
   const current = views[idx];
   const isSpread = current.length > 1;
 
+  const markLoaded = (src) => setLoaded((m) => (m[src] ? m : { ...m, [src]: true }));
+
+  // 当前视图全部加载完成后，再低优先预载相邻视图（带宽优先当前页）
+  useEffect(() => {
+    if (!started) return undefined;
+    const allLoaded = current.every((n) => loaded[catalogPageSrc(n)]);
+    if (!allLoaded) return undefined;
+    const timer = setTimeout(() => {
+      [idx - 1, idx + 1].forEach((j) =>
+        (views[j] || []).forEach((n) => {
+          const s = catalogPageSrc(n);
+          if (loaded[s]) return;
+          const im = new Image();
+          try {
+            im.fetchPriority = 'low';
+          } catch {
+            /* ignore */
+          }
+          im.src = s;
+        }),
+      );
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [started, idx, views, current, loaded]);
+
   const showView = (i) => {
     const next = Math.max(0, Math.min(views.length - 1, i));
     const target = views[next];
     setPage(target[0]);
     setNumText(String(target[0]));
     if (stageRef.current) stageRef.current.scrollTop = 0;
-    // 预载相邻视图
-    [next - 1, next + 1].forEach((j) => {
-      (views[j] || []).forEach((n) => {
-        new Image().src = catalogPageSrc(n);
-      });
-    });
   };
 
   // 页码输入：跳转到包含该页的视图
@@ -53,24 +220,24 @@ export default function PdfViewer({ view, onBack }) {
     }
   };
 
-  // 首次进入 PDF 模式才加载图片（并预载首批视图）
+  // 首次进入 PDF 模式才开始加载（只加载当前视图，不批量预载）
   useEffect(() => {
-    if (view === 'pdf' && !started) {
-      setStarted(true);
-      views.slice(0, 4).forEach((v) =>
-        v.forEach((n) => {
-          new Image().src = catalogPageSrc(n);
-        }),
-      );
-    }
-  }, [view, started, views]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (view === 'pdf' && !started) setStarted(true);
+  }, [view, started]);
 
-  // 键盘翻页（按视图步进）
+  // 键盘翻页（按视图步进）；放大层打开时 Esc 只关放大层
   useEffect(() => {
     if (view !== 'pdf') return undefined;
     const onKey = (e) => {
       const ae = document.activeElement;
       if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
+      if (zoom) {
+        if (e.key === 'Escape') {
+          setZoom(null);
+          e.preventDefault();
+        }
+        return;
+      }
       if (e.key === 'ArrowLeft') {
         showView(idx - 1);
         e.preventDefault();
@@ -83,84 +250,101 @@ export default function PdfViewer({ view, onBack }) {
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [view, idx, views]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const markLoaded = (src) =>
-    setLoading((m) => (m[src] === true ? m : { ...m, [src]: true }));
+  }, [view, zoom, idx, views]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const srcs = started ? current.map((n) => ({ n, src: catalogPageSrc(n) })) : [];
 
   return (
-    <div className="pdf-viewer" id="pdfView">
-      <div className="pv-bar">
-        <button type="button" className="pv-back" onClick={onBack}>
-          {t('pdf.back')}
-        </button>
-        <button
-          type="button"
-          className="pv-nav"
-          disabled={idx <= 0}
-          onClick={() => showView(idx - 1)}
-        >
-          {t('pdf.prev')}
-        </button>
-        <span className="pv-page">
-          <input
-            type="text"
-            inputMode="numeric"
-            aria-label="page number"
-            value={numText}
-            onChange={(e) => setNumText(e.target.value)}
-            onBlur={(e) => jumpToPage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                jumpToPage(e.target.value);
-                e.currentTarget.blur();
-              }
-            }}
-          />
-          {isSpread && (
-            <span className="pv-page-range">
-              –{current[1]}
-            </span>
-          )}{' '}
-          / <b>{CATALOG_PAGES}</b>
-        </span>
-        <button
-          type="button"
-          className="pv-nav"
-          disabled={idx >= views.length - 1}
-          onClick={() => showView(idx + 1)}
-        >
-          {t('pdf.next')}
-        </button>
-        <span className="pv-hint">{t('pdf.hint')}</span>
-        <a
-          className="pv-open"
-          href="assets/docs/catalog-2020.pdf"
-          target="_blank"
-          rel="noopener"
-        >
-          {t('pdf.open')}
-        </a>
+    <>
+      <div className="pdf-viewer" id="pdfView">
+        <div className="pv-bar">
+          <button type="button" className="pv-back" onClick={onBack}>
+            {t('pdf.back')}
+          </button>
+          <button
+            type="button"
+            className="pv-nav"
+            disabled={idx <= 0}
+            onClick={() => showView(idx - 1)}
+          >
+            {t('pdf.prev')}
+          </button>
+          <span className="pv-page">
+            <input
+              type="text"
+              inputMode="numeric"
+              aria-label="page number"
+              value={numText}
+              onChange={(e) => setNumText(e.target.value)}
+              onBlur={(e) => jumpToPage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  jumpToPage(e.target.value);
+                  e.currentTarget.blur();
+                }
+              }}
+            />
+            {isSpread && <span className="pv-page-range">–{current[1]}</span>} /{' '}
+            <b>{CATALOG_PAGES}</b>
+          </span>
+          <button
+            type="button"
+            className="pv-nav"
+            disabled={idx >= views.length - 1}
+            onClick={() => showView(idx + 1)}
+          >
+            {t('pdf.next')}
+          </button>
+          <span className="pv-hint">{t('pdf.hint')}</span>
+          <a
+            className="pv-open"
+            href="assets/docs/catalog-2020.pdf"
+            target="_blank"
+            rel="noopener"
+          >
+            {t('pdf.open')}
+          </a>
+        </div>
+        <div className="pv-stage-wrap">
+          <button
+            type="button"
+            className="pv-edge pv-edge-prev"
+            disabled={idx <= 0}
+            onClick={() => showView(idx - 1)}
+            aria-label={t('pdf.prev')}
+          >
+            ‹
+          </button>
+          <div className={`pv-stage${isSpread ? ' spread' : ''}`} ref={stageRef}>
+            {srcs.map(({ n, src }) => (
+              <img
+                key={src}
+                alt={`产品画册第 ${n} 页`}
+                src={src}
+                fetchPriority="high"
+                decoding="async"
+                // 渐进式 JPEG 直接显示（不再等 load 才可见），边下载边渲染
+                ref={(el) => {
+                  if (el && el.complete && el.naturalWidth > 0) markLoaded(src);
+                }}
+                onLoad={() => markLoaded(src)}
+                onError={() => markLoaded(src)}
+                onClick={() => view === 'pdf' && setZoom({ src, label: `${n} / ${CATALOG_PAGES}` })}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            className="pv-edge pv-edge-next"
+            disabled={idx >= views.length - 1}
+            onClick={() => showView(idx + 1)}
+            aria-label={t('pdf.next')}
+          >
+            ›
+          </button>
+        </div>
       </div>
-      <div className={`pv-stage${isSpread ? ' spread' : ''}`} ref={stageRef}>
-        {srcs.map(({ n, src }) => (
-          <img
-            key={src}
-            alt={`产品画册第 ${n} 页`}
-            className={loading[src] === true ? undefined : 'loading'}
-            src={src}
-            // 已有缓存的图片在挂载时同步判定完成，避免过渡动画卡在半透明
-            ref={(el) => {
-              if (el && el.complete && el.naturalWidth > 0) markLoaded(src);
-            }}
-            onLoad={() => markLoaded(src)}
-            onError={() => markLoaded(src)}
-            onClick={() => view === 'pdf' && showView(idx + 1)}
-          />
-        ))}
-      </div>
-    </div>
+      {zoom && <PageZoom src={zoom.src} label={zoom.label} onClose={() => setZoom(null)} />}
+    </>
   );
 }

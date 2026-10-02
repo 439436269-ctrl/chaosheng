@@ -22,9 +22,56 @@
 .pv-back:hover{color:var(--blue);border-color:var(--blue)}
 .pv-open{margin-left:auto;font-size:12.5px;font-weight:600;color:var(--blue-deep);background:var(--blue-soft);border:1px solid #B8CCF0;border-radius:8px;padding:7px 15px;white-space:nowrap;transition:background .15s}
 .pv-open:hover{background:#D6E7FB}
-.pv-stage{display:flex;justify-content:center;align-items:flex-start;gap:14px;padding:16px;background:#EDEFF3;max-height:calc(100vh - 280px);overflow:auto}
-.pv-stage img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);transition:opacity .18s;cursor:pointer;flex:none}
-.pv-stage img.loading{opacity:.2}
+.pv-stage-wrap{position:relative;display:flex;min-height:0}
+.pv-stage{display:flex;justify-content:center;align-items:flex-start;gap:14px;padding:16px;background:#EDEFF3;max-height:calc(100vh - 280px);overflow:auto;flex:1 1 auto;min-width:0}
+.pv-stage img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);cursor:pointer;flex:none}
+/* 两侧大翻页按钮 */
+.pv-edge{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:8;
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(255,255,255,.92);border:1px solid var(--border);
+  color:var(--blue-deep);font-size:30px;line-height:1;
+  display:grid;place-items:center;cursor:pointer;
+  box-shadow:0 6px 18px rgba(15,30,70,.22);
+  transition:background .15s,transform .15s,opacity .15s;
+}
+.pv-edge:hover{background:#fff;transform:translateY(-50%) scale(1.06)}
+.pv-edge:disabled{opacity:.3;cursor:default;transform:translateY(-50%)}
+.pv-edge-prev{left:14px}
+.pv-edge-next{right:14px}
+/* 全屏放大层 */
+.pv-zoom{
+  position:fixed;inset:0;z-index:250;background:rgba(10,16,34,.96);
+  display:grid;place-items:center;overflow:hidden;
+  touch-action:none;cursor:grab;
+}
+.pv-zoom:active{cursor:grabbing}
+.pv-zoom img{
+  max-width:96vw;max-height:92vh;background:#fff;
+  box-shadow:0 16px 60px rgba(0,0,0,.5);
+  transform-origin:center center;will-change:transform;
+  -webkit-user-drag:none;user-select:none;
+}
+.pv-zoom-label{
+  position:absolute;left:16px;top:12px;z-index:2;
+  color:rgba(255,255,255,.9);font-size:14px;font-weight:700;letter-spacing:.08em;
+  background:rgba(0,0,0,.35);border-radius:8px;padding:5px 12px;
+}
+.pv-zoom-tools{
+  position:absolute;right:14px;top:10px;z-index:2;display:flex;gap:8px;
+}
+.pv-zoom-tools button{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.4);
+  color:#fff;font-size:18px;cursor:pointer;transition:background .15s;
+}
+.pv-zoom-tools button:hover{background:rgba(255,255,255,.3)}
+.pv-zoom-close{font-size:20px !important}
+.pv-zoom-hint{
+  position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:2;
+  color:rgba(255,255,255,.75);font-size:12.5px;letter-spacing:.05em;
+  background:rgba(0,0,0,.35);border-radius:999px;padding:6px 16px;white-space:nowrap;
+}
 /* 跨页布局：窄屏（手机竖/横屏）两页上下堆叠，同一视图内滚动查看 */
 .pv-stage.spread{flex-direction:column;align-items:center;justify-content:flex-start}
 .pv-stage.spread img{max-width:100%}
@@ -36,6 +83,7 @@ body.pdf-page .pdf-viewer{
   flex-direction:column;border:0;border-radius:0;box-shadow:none;background:#EDEFF3;
 }
 body.pdf-page .pv-bar{flex:0 0 auto;background:#fff;padding:10px 18px}
+body.pdf-page .pv-stage-wrap{flex:1 1 auto;min-height:0}
 body.pdf-page .pv-stage{flex:1 1 auto;min-height:0;max-height:none;align-items:center;overflow:auto}
 body.pdf-page .pv-stage img{max-height:100%;width:auto;object-fit:contain}
 /* 手机（<900px）：不限高，按宽度铺满后纵向滚动，保证可读性 */
@@ -48,4 +96,9 @@ body.pdf-page .pv-stage img{max-height:100%;width:auto;object-fit:contain}
   .pv-stage.spread img{max-width:calc((100% - 14px) / 2)}
   body.pdf-page .pv-stage.spread img{max-height:100%;max-width:calc((100% - 14px) / 2)}
 }
-@media (max-width:560px){.pv-hint{display:none}.pv-bar{gap:8px;padding:10px 12px}.pv-nav{padding:7px 12px;font-size:13px}}
+@media (max-width:560px){
+  .pv-hint{display:none}.pv-bar{gap:8px;padding:10px 12px}.pv-nav{padding:7px 12px;font-size:13px}
+  .pv-edge{width:44px;height:44px;font-size:25px}
+  .pv-edge-prev{left:8px}.pv-edge-next{right:8px}
+  .pv-zoom-hint{font-size:11px;padding:5px 10px;max-width:92vw;white-space:normal;text-align:center}
+}

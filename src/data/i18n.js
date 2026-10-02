@@ -26,7 +26,7 @@ export const I18N = {
     'btn.preview': '在线预览', 'btn.download': '下载', 'btn.close': '关闭',
     'filter.all': '全部', 'count.prefix': '件 · 当前筛选：',
     'view.grid': '网页目录', 'view.pdf': 'PDF 画册', 'pdf.prev': '‹ 上一页', 'pdf.next': '下一页 ›',
-    'pdf.hint': '← → 键翻页 · 点图翻页', 'pdf.open': '打开原始 PDF', 'pdf.back': '‹ 返回网页目录',
+    'pdf.hint': '‹ › 按钮 · ← → 键翻页', 'pdf.open': '打开原始 PDF', 'pdf.back': '‹ 返回网页目录', 'pdf.zoom.hint': '滚轮/双指缩放 · 拖动平移 · 点图放大或还原 · ✕ 关闭',
     'empty.ph': '预留位<br>后续放入新产品图片<br>与编号即可',
   },
   en: {
@@ -55,7 +55,7 @@ export const I18N = {
     'btn.preview': 'Preview', 'btn.download': 'Download', 'btn.close': 'Close',
     'filter.all': 'All', 'count.prefix': ' items · filter: ',
     'view.grid': 'Grid View', 'view.pdf': 'PDF Catalog', 'pdf.prev': '‹ Prev', 'pdf.next': 'Next ›',
-    'pdf.hint': 'Arrow keys · click image to flip', 'pdf.open': 'Open Original PDF', 'pdf.back': '‹ Back to Grid',
+    'pdf.hint': '‹ › buttons · Arrow keys to flip', 'pdf.open': 'Open Original PDF', 'pdf.back': '‹ Back to Grid', 'pdf.zoom.hint': 'Scroll/pinch to zoom · drag to pan · click image to fit · ✕ close',
     'empty.ph': 'Placeholder<br>Add new product image<br>and part number',
   },
 };
