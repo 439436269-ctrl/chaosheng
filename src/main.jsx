@@ -15,6 +15,7 @@ import './styles/gallery.css';
 import './styles/new.css';
 import './styles/docs.css';
 import './styles/pdf.css';
+import './styles/catalog-html.css';
 import './styles/responsive.css';
 
 createRoot(document.getElementById('root')).render(

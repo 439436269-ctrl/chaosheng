@@ -5,24 +5,29 @@ import {
   catalogPageSrc,
   catalogDisplaySrc,
   catalogMidSrc,
+  catalogPageKind,
+  catalogHtmlId,
   buildSpreadViews,
 } from '../data/site.js';
+import CatalogHtmlPage from './CatalogHtmlPage.jsx';
 
 const clampScale = (s) => Math.min(4, Math.max(0.5, s));
 
 /**
  * 全屏放大查看器：
  * - 滚轮/双指缩放（以指针为锚点）、拖拽平移
- * - 点图片：fit ↔ 1.6 倍切换；点空白/✕/Esc 关闭
+ * - 点内容：fit ↔ 1.6 倍切换；点空白/✕/Esc 关闭
+ * - 图片页加载高清原图叠加；HTML 页为矢量内容，任意倍数直接清晰
  */
-function PageZoom({ displaySrc, fullSrc, label, onClose }) {
+function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, label, onClose }) {
   const { t } = useI18n();
   const [vt, setVt] = useState({ s: 1, x: 0, y: 0 });
   const [fullReady, setFullReady] = useState(false);
   const [fullFailed, setFullFailed] = useState(false);
 
-  // 显示层秒开，全尺寸原图后台加载完成后无闪烁叠加替换
+  // 显示层秒开，全尺寸原图后台加载完成后无闪烁叠加替换（HTML 页无需原图）
   useEffect(() => {
+    if (!fullSrc) return undefined;
     const im = new Image();
     im.onload = () => setFullReady(true);
     im.onerror = () => setFullFailed(true);
@@ -77,7 +82,8 @@ function PageZoom({ displaySrc, fullSrc, label, onClose }) {
         y0: e.clientY,
         tx0: vt.x,
         ty0: vt.y,
-        onImg: e.target.tagName === 'IMG',
+        // 点内容（图片或 HTML 页内部）：fit ↔ 放大；点深色背景：关闭
+        onImg: !!e.target.closest('.pv-zoom-inner'),
       };
     }
   };
@@ -147,16 +153,24 @@ function PageZoom({ displaySrc, fullSrc, label, onClose }) {
         className="pv-zoom-inner"
         style={{ transform: `translate(${vt.x}px, ${vt.y}px) scale(${vt.s})` }}
       >
-        <img className="pv-zoom-base" src={displaySrc} alt={label} draggable={false} />
-        {fullReady && (
-          <img className="pv-zoom-full" src={fullSrc} alt="" draggable={false} />
+        {htmlId ? (
+          <div className="pv-zoom-hp">
+            <CatalogHtmlPage id={htmlId} pageNumber={pageNumber} />
+          </div>
+        ) : (
+          <>
+            <img className="pv-zoom-base" src={displaySrc} alt={label} draggable={false} />
+            {fullReady && (
+              <img className="pv-zoom-full" src={fullSrc} alt="" draggable={false} />
+            )}
+          </>
         )}
       </div>
       <span className="pv-zoom-label">{label}</span>
-      {!fullReady && !fullFailed && (
+      {fullSrc && !fullReady && !fullFailed && (
         <span className="pv-zoom-badge">{t('pdf.zoom.loading')}</span>
       )}
-      {fullFailed && <span className="pv-zoom-badge">{t('pdf.zoom.failed')}</span>}
+      {fullSrc && fullFailed && <span className="pv-zoom-badge">{t('pdf.zoom.failed')}</span>}
       <div className="pv-zoom-tools">
         <button type="button" onClick={() => step(1.3)} aria-label="zoom in">
           ＋
@@ -209,13 +223,20 @@ export default function PdfViewer({ view, onBack }) {
   const preloadRef = useRef(new Map());
 
   // 当前视图（显示层）全部加载完后，才低优先预载相邻视图；视图切换即取消旧预载
+  // HTML 页无图片 src，视为已加载（组件随视图即时渲染）
   useEffect(() => {
     if (!started) return undefined;
+    const imgSrc = (n) => {
+      const s = catalogDisplaySrc(n);
+      return catalogPageKind(n) === 'image' ? s : null;
+    };
     // 取消不再属于当前邻居的在途预载
     const alive = new Set();
     [idx - 1, idx, idx + 1].forEach((j) =>
       (views[j] || []).forEach((n) => {
-        alive.add(catalogDisplaySrc(n));
+        const s = imgSrc(n);
+        if (!s) return;
+        alive.add(s);
         alive.add(catalogMidSrc(n));
       }),
     );
@@ -228,13 +249,17 @@ export default function PdfViewer({ view, onBack }) {
       }
     });
 
-    const allLoaded = current.every((n) => loaded[catalogDisplaySrc(n)]);
+    const allLoaded = current.every((n) => {
+      const s = imgSrc(n);
+      return !s || loaded[s];
+    });
     if (!allLoaded) return undefined;
     const timer = setTimeout(() => {
       // 按设备像素比选择预载档位：DPR1 用 952px 中间档，高分屏用 1488px
       const midPreferred = (window.devicePixelRatio || 1) < 1.5;
       [idx - 1, idx + 1].forEach((j) =>
         (views[j] || []).forEach((n) => {
+          if (catalogPageKind(n) !== 'image') return;
           const s = midPreferred ? catalogMidSrc(n) : catalogDisplaySrc(n);
           if (preloadRef.current.has(s) || loaded[catalogDisplaySrc(n)]) return;
           const im = new Image();
@@ -314,8 +339,32 @@ export default function PdfViewer({ view, onBack }) {
     return () => document.removeEventListener('keydown', onKey);
   }, [view, zoom, idx, views]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // stage 用显示层小图（118KB 均值，全尺寸 1/6），点放大才加载原图
-  const srcs = started ? current.map((n) => ({ n, src: catalogDisplaySrc(n) })) : [];
+  // stage 用显示层小图（118KB 均值，全尺寸 1/6），点放大才加载原图；HTML 页直接渲染组件
+  const srcs = started
+    ? current.map((n) => ({
+        n,
+        kind: catalogPageKind(n),
+        htmlId: catalogHtmlId(n),
+        src: catalogDisplaySrc(n),
+      }))
+    : [];
+
+  const openZoom = (item) => {
+    if (view !== 'pdf') return;
+    if (item.kind === 'html') {
+      setZoom({
+        htmlId: item.htmlId,
+        pageNumber: item.n,
+        label: `${item.n} / ${CATALOG_PAGES}`,
+      });
+    } else {
+      setZoom({
+        displaySrc: item.src,
+        fullSrc: catalogPageSrc(item.n),
+        label: `${item.n} / ${CATALOG_PAGES}`,
+      });
+    }
+  };
 
   return (
     <>
@@ -379,31 +428,40 @@ export default function PdfViewer({ view, onBack }) {
             ‹
           </button>
           <div className={`pv-stage${isSpread ? ' spread' : ''}`} ref={stageRef}>
-            {srcs.map(({ n, src }) => (
-              <img
-                key={src}
-                alt={`产品画册第 ${n} 页`}
-                src={src}
-                srcSet={`${catalogMidSrc(n)} 952w, ${src} 1488w`}
-                sizes="(max-width:899px) 100vw, 50vw"
-                fetchPriority="high"
-                decoding="async"
-                // 显示层小图直接显示，秒开
-                ref={(el) => {
-                  if (el && el.complete && el.naturalWidth > 0) markLoaded(src);
-                }}
-                onLoad={() => markLoaded(src)}
-                onError={() => markLoaded(src)}
-                onClick={() =>
-                  view === 'pdf' &&
-                  setZoom({
-                    displaySrc: catalogDisplaySrc(n),
-                    fullSrc: catalogPageSrc(n),
-                    label: `${n} / ${CATALOG_PAGES}`,
-                  })
-                }
-              />
-            ))}
+            {srcs.map((item) => {
+              const { n, kind, htmlId, src } = item;
+              if (kind === 'html') {
+                return (
+                  <div
+                    key={`html-${n}`}
+                    className="pv-html-page"
+                    role="img"
+                    aria-label={`产品画册第 ${n} 页`}
+                    onClick={() => openZoom(item)}
+                  >
+                    <CatalogHtmlPage id={htmlId} pageNumber={n} />
+                  </div>
+                );
+              }
+              return (
+                <img
+                  key={src}
+                  alt={`产品画册第 ${n} 页`}
+                  src={src}
+                  srcSet={`${catalogMidSrc(n)} 952w, ${src} 1488w`}
+                  sizes="(max-width:899px) 100vw, 50vw"
+                  fetchPriority="high"
+                  decoding="async"
+                  // 显示层小图直接显示，秒开
+                  ref={(el) => {
+                    if (el && el.complete && el.naturalWidth > 0) markLoaded(src);
+                  }}
+                  onLoad={() => markLoaded(src)}
+                  onError={() => markLoaded(src)}
+                  onClick={() => openZoom(item)}
+                />
+              );
+            })}
           </div>
           <button
             type="button"
@@ -420,6 +478,8 @@ export default function PdfViewer({ view, onBack }) {
         <PageZoom
           displaySrc={zoom.displaySrc}
           fullSrc={zoom.fullSrc}
+          htmlId={zoom.htmlId}
+          pageNumber={zoom.pageNumber}
           label={zoom.label}
           onClose={() => setZoom(null)}
         />

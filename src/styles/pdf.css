@@ -24,7 +24,7 @@
 .pv-open:hover{background:#D6E7FB}
 .pv-stage-wrap{position:relative;display:flex;min-height:0}
 .pv-stage{display:flex;justify-content:center;align-items:flex-start;gap:14px;padding:16px;background:#EDEFF3;max-height:calc(100vh - 280px);overflow:auto;flex:1 1 auto;min-width:0}
-.pv-stage img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);cursor:pointer;flex:none}
+.pv-stage > img{display:block;max-width:100%;height:auto;background:#fff;box-shadow:0 6px 26px rgba(15,30,70,.18);cursor:pointer;flex:none}
 /* 两侧大翻页按钮 */
 .pv-edge{
   position:absolute;top:50%;transform:translateY(-50%);z-index:8;
@@ -47,7 +47,8 @@
 }
 .pv-zoom:active{cursor:grabbing}
 .pv-zoom-inner{position:relative;will-change:transform;transform-origin:center center}
-.pv-zoom img{
+/* 仅作用于舞台/放大层直接子级的画册页图片（HTML 页内部图片不受影响） */
+.pv-zoom-inner > img{
   display:block;
   max-width:96vw;max-height:92vh;background:#fff;
   box-shadow:0 16px 60px rgba(0,0,0,.5);
@@ -86,8 +87,8 @@
 }
 /* 跨页布局：窄屏（手机竖/横屏）两页上下堆叠，同一视图内滚动查看 */
 .pv-stage.spread{flex-direction:column;align-items:center;justify-content:flex-start}
-.pv-stage.spread img{max-width:100%}
-body.pdf-page .pv-stage.spread img{max-height:none;width:auto}
+.pv-stage.spread > img{max-width:100%}
+body.pdf-page .pv-stage.spread > img{max-height:none;width:auto}
 /* 整页 PDF 画册形态：查看器铺满视口（导航栏之下），覆盖其余页面内容 */
 body.pdf-page{overflow:hidden}
 body.pdf-page .pdf-viewer{
@@ -97,16 +98,16 @@ body.pdf-page .pdf-viewer{
 body.pdf-page .pv-bar{flex:0 0 auto;background:#fff;padding:10px 18px}
 body.pdf-page .pv-stage-wrap{flex:1 1 auto;min-height:0}
 body.pdf-page .pv-stage{flex:1 1 auto;min-height:0;max-height:none;align-items:center;overflow:auto}
-body.pdf-page .pv-stage img{max-height:100%;width:auto;object-fit:contain}
+body.pdf-page .pv-stage > img{max-height:100%;width:auto;object-fit:contain}
 /* 手机（<900px）：不限高，按宽度铺满后纵向滚动，保证可读性 */
 @media (max-width:899px){
-  body.pdf-page .pv-stage img{max-height:none;max-width:100%}
+  body.pdf-page .pv-stage > img{max-height:none;max-width:100%}
 }
 /* ≥900px：两页并排 */
 @media (min-width:900px){
   .pv-stage.spread{flex-direction:row;justify-content:center}
-  .pv-stage.spread img{max-width:calc((100% - 14px) / 2)}
-  body.pdf-page .pv-stage.spread img{max-height:100%;max-width:calc((100% - 14px) / 2)}
+  .pv-stage.spread > img{max-width:calc((100% - 14px) / 2)}
+  body.pdf-page .pv-stage.spread > img{max-height:100%;max-width:calc((100% - 14px) / 2)}
 }
 @media (max-width:560px){
   .pv-hint{display:none}.pv-bar{gap:8px;padding:10px 12px}.pv-nav{padding:7px 12px;font-size:13px}

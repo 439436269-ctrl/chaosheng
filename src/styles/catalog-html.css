@@ -1,0 +1,312 @@
+/* ===== 画册 HTML 渲染页（组件页，与扫描图片页在舞台/放大层中同等行为） ===== */
+
+/* —— 舞台与放大层共用的页容器 —— */
+.pv-html-page,
+.pv-zoom-hp {
+  position: relative;
+  aspect-ratio: 2380 / 3368;
+  overflow: hidden;
+  background: #fff;
+  container-type: inline-size; /* .chp 内部一律用 cqw 相对页宽缩放 */
+}
+
+/* 舞台：默认宽度适配（同图片页 max-width:100% 行为） */
+.pv-html-page {
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  box-shadow: 0 6px 26px rgba(15, 30, 70, 0.18);
+  cursor: pointer;
+  flex: none;
+}
+/* 整页 PDF 形态（≥900px）：高度适配，同图片页 max-height:100%; width:auto */
+body.pdf-page .pv-stage .pv-html-page {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+}
+/* 手机（<900px）：宽度铺满后纵向滚动，与图片页一致 */
+@media (max-width: 899px) {
+  body.pdf-page .pv-stage .pv-html-page {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+}
+.pv-stage.spread .pv-html-page {
+  max-width: calc((100% - 14px) / 2);
+}
+
+/* 放大层：按视口 fit（同图片页 96vw/92vh 约束）；HTML 为矢量内容，任意倍数清晰 */
+.pv-zoom-hp {
+  width: min(96vw, calc(92vh * 2380 / 3368));
+  height: auto;
+  max-width: 96vw;
+  box-shadow: 0 16px 60px rgba(0, 0, 0, 0.5);
+}
+
+/* —— 页内容：所有尺寸用 cqw（相对页宽），随容器任意缩放比例恒定 —— */
+.chp {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  color: #1a1a1a;
+  font-family: 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 顶部渐变条（测量：y 2.35–6.92cqw，#2B3790 → #1869B8 → #039BE5） */
+.chp-top {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 2.35cqw;
+  height: 4.57cqw;
+  background: linear-gradient(90deg, #2b3790 0%, #1869b8 50%, #039be5 100%);
+}
+
+/* 页眉渐变面板（测量：left 10.3cqw，top 8.67cqw 高 11.56cqw，浅→青→藏青） */
+.chp-head {
+  position: absolute;
+  left: 10.3cqw;
+  right: 0;
+  top: 8.67cqw;
+  height: 11.56cqw;
+  background: linear-gradient(
+    90deg,
+    #eaf8fd 0%,
+    #a2dbf7 13%,
+    #85cef5 22%,
+    #45bbec 33%,
+    #01a5e8 44%,
+    #0c8bd4 55%,
+    #1473c0 66%,
+    #225db4 78%,
+    #2647a0 89%,
+    #2f3386 100%
+  );
+}
+
+/* logo（白底图 multiply 融入浅色渐变，与扫描页一致） */
+.chp-logo {
+  position: absolute;
+  left: 11cqw;
+  top: 8.67cqw;
+  height: 11.56cqw;
+  mix-blend-mode: multiply;
+}
+.chp-logo img {
+  height: 100%;
+  width: auto;
+  display: block;
+}
+
+/* 联系方式（白粗体，实测原版：字号 ≈2.1cqw、行距 3.36cqw、FAX 列 56.5cqw） */
+.chp-tel,
+.chp-fax {
+  position: absolute;
+  top: 8.67cqw;
+  height: 11.56cqw;
+  padding-top: 0.95cqw;
+  color: #fff;
+  font-weight: 700;
+  font-size: 2.1cqw;
+  line-height: 1.6;
+  white-space: nowrap;
+  text-shadow: 0 0.1cqw 0.2cqw rgba(10, 40, 90, 0.3);
+}
+.chp-tel {
+  left: 28.6cqw;
+}
+.chp-fax {
+  left: 56.5cqw;
+}
+
+/* 二维码（测量：宽 ≈9cqw，右缘 ≈10.3cqw，白底自带边框） */
+.chp-qr {
+  position: absolute;
+  right: 10.3cqw;
+  top: 8.67cqw;
+  height: 11.56cqw;
+  display: flex;
+  align-items: center;
+}
+.chp-qr img {
+  width: 9cqw;
+  height: 9cqw;
+  display: block;
+  background: #fff;
+  padding: 0.35cqw;
+  box-sizing: content-box;
+}
+
+/* 标题带（页眉与网格之间，本页特有） */
+.chp-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 21.6cqw;
+  text-align: center;
+  line-height: 1.25;
+}
+.chp-title-zh {
+  display: block;
+  font-size: 3.5cqw;
+  font-weight: 800;
+  color: #1e4fa3;
+  letter-spacing: 0.14em;
+}
+.chp-title-en {
+  display: block;
+  margin-top: 0.9cqw;
+  font-size: 1.75cqw;
+  font-weight: 700;
+  color: #c69031;
+  letter-spacing: 0.55em;
+  text-indent: 0.55em;
+}
+
+/* 商品网格（测量：左右边距 9.88/10.35cqw，底线 127.7cqw；绿线宽 2px≈0.14cqw） */
+.chp-grid {
+  position: absolute;
+  left: 9.88cqw;
+  width: 79.77cqw;
+  top: 31cqw;
+  bottom: 13.81cqw;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  /* 行数随条目数自适应（19 新品 + 1 引导格 = 4 行；后续增删自动重排） */
+  grid-auto-rows: minmax(0, 1fr);
+  border-top: max(1px, 0.14cqw) solid #8fb296;
+  border-left: max(1px, 0.14cqw) solid #8fb296;
+}
+.chp-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-right: max(1px, 0.14cqw) solid #8fb296;
+  border-bottom: max(1px, 0.14cqw) solid #8fb296;
+}
+.chp-cell-img {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 1.4cqw 1.5cqw 0.3cqw;
+}
+.chp-cell-img img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+.chp-cell-txt {
+  flex: 0 0 auto;
+  padding: 0.2cqw 1cqw 1.5cqw;
+}
+/* 编号：金色，居中（测量：字高 21px→≈1.8cqw，与单元格水平居中） */
+.chp-code {
+  display: block;
+  font-size: 1.8cqw;
+  font-weight: 700;
+  color: #c69031;
+  line-height: 1.3;
+  text-align: center;
+  margin-bottom: 0.45cqw;
+}
+/* 名称/件号：左对齐，缩进 3.4cqw（测量 x198 起，行距 22px≈1.48cqw） */
+.chp-row {
+  display: block;
+  margin-left: 2.4cqw;
+  font-size: 1.3cqw;
+  font-weight: 700;
+  color: #1c1c1c;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 末格：扫码引导 */
+.chp-cell-info {
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.1cqw;
+  background: linear-gradient(160deg, #f4fbfe 0%, #e4f2fc 100%);
+  padding: 1.5cqw;
+}
+.chp-cell-info img {
+  width: 7.2cqw;
+  height: 7.2cqw;
+  display: block;
+}
+.chp-info-t1 {
+  font-size: 1.55cqw;
+  font-weight: 800;
+  color: #1e4fa3;
+  line-height: 1.4;
+}
+.chp-info-t2 {
+  font-size: 1.2cqw;
+  font-weight: 700;
+  color: #c69031;
+  letter-spacing: 0.06em;
+}
+
+/* 页码块（测量：宽 8.94cqw 高 8.33cqw，顶 66.55cqw，色 #2F318C；
+   印刷偶数页页码在左、奇数页在右，与扫描页一致） */
+.chp-no {
+  position: absolute;
+  top: 66.55cqw;
+  width: 8.94cqw;
+  height: 8.33cqw;
+  background: #2f318c;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 5cqw;
+  font-weight: 700;
+  line-height: 1;
+}
+.chp-no-left {
+  left: 0;
+}
+.chp-no-right {
+  right: 0;
+}
+
+/* 页脚（测量：top 132.15cqw 高 6.87cqw，渐变 0→79% 淡出为白） */
+.chp-foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 132.15cqw;
+  height: 6.87cqw;
+  display: flex;
+  align-items: center;
+  background: linear-gradient(
+    90deg,
+    #2b3790 0%,
+    #1765b6 20%,
+    #0f80cb 30%,
+    #039be3 40%,
+    #34b5ee 50%,
+    #7bcdf4 60%,
+    #c3e9f8 70%,
+    #e6f5fb 75%,
+    #ffffff 79%
+  );
+}
+.chp-foot span {
+  margin-left: 11.5cqw;
+  color: #fff;
+  font-size: 2.3cqw;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0.1cqw 0.2cqw rgba(0, 50, 110, 0.35);
+  white-space: nowrap;
+}

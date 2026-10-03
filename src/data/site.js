@@ -95,37 +95,78 @@ export const DOCS = [
   },
 ];
 
-// PDF 画册：基础 41 页，后续新品页按顺序追加即可（图片放 assets/docs/catalog/）
-// 例：{ title: '新品推荐 2026.10', src: 'assets/docs/catalog/new_2026_10.jpg' }
+// PDF 画册分页：
+// - 基础 41 页为扫描图（assets/docs/catalog/page_NN_{m,d,z}.webp）
+// - EXTRA_CATALOG_PAGES 可插入 HTML 渲染页（数据驱动，便于后续新增/替换内容）：
+//     { kind:'html', id:'new-arrivals', after:40 } → 插在基础第 40 页（紫色汇总页）之后、封底之前
+//     { kind:'image', src:'xxx.jpg', after:39 }    → 插入整图页
+// - 新增/替换新品：只需在上面的 NEW_ARRIVALS 数组追加条目，
+//   网页「新品推荐」区块与画册第 42 页（HTML 页）会同步生效。
 export const CATALOG_BASE_PAGES = 41;
-export const EXTRA_CATALOG_PAGES = [];
-export const CATALOG_PAGES = CATALOG_BASE_PAGES + EXTRA_CATALOG_PAGES.length;
+export const EXTRA_CATALOG_PAGES = [
+  { kind: 'html', id: 'new-arrivals', after: 40, title: '2026.09 新产品推荐' },
+];
+
+// 分页计划：位置（1 起）→ 内容条目，构建一次
+export const CATALOG_PLAN = (() => {
+  const plan = [];
+  const extras = [...EXTRA_CATALOG_PAGES].sort(
+    (a, b) => (a.after ?? CATALOG_BASE_PAGES) - (b.after ?? CATALOG_BASE_PAGES),
+  );
+  let next = 1;
+  for (const ex of extras) {
+    const after = Math.max(0, Math.min(ex.after ?? CATALOG_BASE_PAGES, CATALOG_BASE_PAGES));
+    for (let b = next; b <= after; b += 1) plan.push({ kind: 'image', base: b });
+    next = after + 1;
+    plan.push(
+      ex.kind === 'html'
+        ? { kind: 'html', id: ex.id, title: ex.title }
+        : { kind: 'image', src: ex.src },
+    );
+  }
+  for (let b = next; b <= CATALOG_BASE_PAGES; b += 1) plan.push({ kind: 'image', base: b });
+  return plan;
+})();
+
+export const CATALOG_PAGES = CATALOG_PLAN.length;
+
+function planAt(n) {
+  return CATALOG_PLAN[n - 1] || null;
+}
+
+// 该页渲染形态：'image'（扫描图）| 'html'（组件渲染）
+export function catalogPageKind(n) {
+  const p = planAt(n);
+  return p ? p.kind : 'image';
+}
+
+// HTML 页的组件 id（非 HTML 页返回 null）
+export function catalogHtmlId(n) {
+  const p = planAt(n);
+  return p && p.kind === 'html' ? p.id : null;
+}
+
+function pageSrcFor(n, suffix) {
+  const p = planAt(n);
+  if (!p || p.kind === 'html') return '';
+  if (p.src) return p.src; // 自定义整图（无分档）
+  const nn = p.base < 10 ? '0' + p.base : p.base;
+  return 'assets/docs/catalog/page_' + nn + suffix + '.webp';
+}
 
 // 放大原图：2380px WebP q90（约 200KB，同分辨率 JPEG 的 40%），仅点放大时加载
 export function catalogPageSrc(n) {
-  if (n <= CATALOG_BASE_PAGES) {
-    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '_z.webp';
-  }
-  const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
-  return extra ? extra.src : '';
+  return pageSrcFor(n, '_z');
 }
 
 // 中间档：952px WebP（约 50KB），srcset 给 DPR1 屏用
 export function catalogMidSrc(n) {
-  if (n <= CATALOG_BASE_PAGES) {
-    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '_m.webp';
-  }
-  const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
-  return extra ? extra.src : '';
+  return pageSrcFor(n, '_m');
 }
 
 // 显示层：1488px WebP（均 118KB，全尺寸的 1/6），stage 默认用它；点放大才加载全尺寸
 export function catalogDisplaySrc(n) {
-  if (n <= CATALOG_BASE_PAGES) {
-    return 'assets/docs/catalog/page_' + (n < 10 ? '0' + n : n) + '_d.webp';
-  }
-  const extra = EXTRA_CATALOG_PAGES[n - CATALOG_BASE_PAGES - 1];
-  return extra ? extra.src : '';
+  return pageSrcFor(n, '_d');
 }
 
 // 跨页规则（2026-10 确认）：01 封面单页，02–37 两两合并，38 之后单页
