@@ -50,15 +50,22 @@ const pageToken = (n) => catalogPageLabel(n) || String(n);
  * - 点内容：fit ↔ 1.6 倍切换；点空白/✕/Esc 关闭
  * - 图片页加载高清原图叠加；HTML 页为矢量内容，任意倍数直接清晰
  */
-function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, pageLabel, label, onClose }) {
+function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, pageLabel, label, onClose, onShowProduct }) {
   const { t } = useI18n();
   const [vt, setVt] = useState({ s: 1, x: 0, y: 0 });
   const [fullReady, setFullReady] = useState(false);
   const [fullFailed, setFullFailed] = useState(false);
 
+  // 放大目标切换（整页 ↔ 商品图）时复位视口，避免沿用上一个视图的缩放/位移
+  useEffect(() => {
+    setVt({ s: 1, x: 0, y: 0 });
+  }, [displaySrc, fullSrc, htmlId]);
+
   // 显示层秒开，全尺寸原图后台加载完成后无闪烁叠加替换（HTML 页无需原图）
   useEffect(() => {
     if (!fullSrc) return undefined;
+    setFullReady(false);
+    setFullFailed(false);
     const im = new Image();
     im.onload = () => setFullReady(true);
     im.onerror = () => setFullFailed(true);
@@ -115,6 +122,8 @@ function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, pageLabel, label, o
         ty0: vt.y,
         // 点内容（图片或 HTML 页内部）：fit ↔ 放大；点深色背景：关闭
         onImg: !!e.target.closest('.pv-zoom-inner'),
+        // 点商品图（data-full）：切换为该商品原图
+        prod: e.target.closest('img[data-full]'),
       };
     }
   };
@@ -159,8 +168,11 @@ function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, pageLabel, label, o
     if (pts.size === 0) {
       const d = dragRef.current;
       if (d && !movedRef.current && !e.target.closest('button')) {
-        if (d.onImg) {
-          // 点图片：fit ↔ 放大
+        if (d.prod && onShowProduct) {
+          // 点商品 → 放大该商品原图
+          onShowProduct(d.prod);
+        } else if (d.onImg) {
+          // 点其他内容：fit ↔ 放大
           setVt((v) => (v.s > 1.05 ? { s: 1, x: 0, y: 0 } : { s: 1.6, x: 0, y: 0 }));
         } else {
           onClose();
@@ -388,7 +400,7 @@ export default function PdfViewer({ view, onBack }) {
       if (ae && (ae.tagName === 'INPUT' || ae.tagName === 'TEXTAREA')) return;
       if (zoom) {
         if (e.key === 'Escape') {
-          setZoom(null);
+          setZoom((z) => (z && z.back) || null);
           e.preventDefault();
         }
         return;
@@ -436,6 +448,20 @@ export default function PdfViewer({ view, onBack }) {
       });
     }
   };
+
+  // 点商品 → 放大该商品原图（data-full）；back 为来源视图（放大层点入时返回）
+  const showProduct = (imgEl, back) => {
+    if (view !== 'pdf') return;
+    setZoom({
+      displaySrc: imgEl.getAttribute('src') || imgEl.dataset.full,
+      fullSrc: imgEl.dataset.full,
+      label: `${imgEl.dataset.code} · ${imgEl.alt}`,
+      back: back || null,
+    });
+  };
+
+  // 关闭放大：有来源视图则返回来源（商品图 → 整页），否则回舞台
+  const closeZoom = () => setZoom((z) => (z && z.back) || null);
 
   return (
     <>
@@ -511,7 +537,13 @@ export default function PdfViewer({ view, onBack }) {
                     className="pv-html-page"
                     role="img"
                     aria-label={`产品画册 ${pageToken(n)}`}
-                    onClick={() => openZoom(item)}
+                    onClick={(e) => {
+                      if (view !== 'pdf') return;
+                      // 点商品 → 放大该商品原图；点其他 → 放大整页
+                      const prod = e.target.closest?.('img[data-full]');
+                      if (prod) showProduct(prod, null);
+                      else openZoom(item);
+                    }}
                   >
                     <CatalogHtmlPage id={htmlId} pageNumber={n} label={pageLabel} />
                   </div>
@@ -557,7 +589,8 @@ export default function PdfViewer({ view, onBack }) {
           pageNumber={zoom.pageNumber}
           pageLabel={zoom.pageLabel}
           label={zoom.label}
-          onClose={() => setZoom(null)}
+          onClose={closeZoom}
+          onShowProduct={(prod) => showProduct(prod, zoom)}
         />
       )}
     </>

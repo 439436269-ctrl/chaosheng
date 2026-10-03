@@ -46,7 +46,9 @@
   touch-action:none;cursor:grab;
 }
 .pv-zoom:active{cursor:grabbing}
-.pv-zoom-inner{position:relative;will-change:transform;transform-origin:center center}
+/* 注意：不要加 will-change:transform —— 会把层钉在1x光栅，缩放时文字/图片按位图放大变糊
+   （实测 4x 下 lapvar 121 vs 移除后 1759）。transform 动画由 Chrome 自行提升合成层。 */
+.pv-zoom-inner{position:relative;transform-origin:center center}
 /* 仅作用于舞台/放大层直接子级的画册页图片（HTML 页内部图片不受影响） */
 .pv-zoom-inner > img{
   display:block;

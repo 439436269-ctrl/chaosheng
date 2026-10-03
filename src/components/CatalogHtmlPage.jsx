@@ -20,6 +20,9 @@ function NewArrivalsPage({ pageNumber, label }) {
           src={thumb(s.img)}
           alt={s.name}
           loading="lazy"
+          // 点击商品 → 放大该商品原图（data-full 供舞台/放大层事件判定）
+          data-full={s.img}
+          data-code={s.code}
           onError={(e) => {
             if (!e.currentTarget.dataset.fb) {
               e.currentTarget.dataset.fb = '1';
