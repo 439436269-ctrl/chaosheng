@@ -7,11 +7,42 @@ import {
   catalogMidSrc,
   catalogPageKind,
   catalogHtmlId,
+  catalogPageLabel,
+  findPageByLabel,
   buildSpreadViews,
 } from '../data/site.js';
 import CatalogHtmlPage from './CatalogHtmlPage.jsx';
 
 const clampScale = (s) => Math.min(4, Math.max(0.5, s));
+
+// 页码令牌 → 位置页码：支持位置数字（'41'）与独立页号（'2026-01'）；越界钳制
+function resolvePageToken(raw) {
+  if (raw == null) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  if (/^\d{4}-\d+$/.test(s)) return findPageByLabel(s);
+  const n = parseInt(s, 10);
+  return Number.isFinite(n) && n >= 1 ? Math.min(n, CATALOG_PAGES) : null;
+}
+
+// 页锚点初始值：#page-… 优先，兼容 ?page=；归一到所在视图首页
+function initialPage() {
+  try {
+    const m = /^#page-(.+)$/.exec(location.hash);
+    const raw = m ? m[1] : new URLSearchParams(location.search).get('page');
+    const n = resolvePageToken(raw);
+    if (n) {
+      const v = buildSpreadViews().find((x) => x.includes(n));
+      return v ? v[0] : 1;
+    }
+  } catch {
+    /* ignore */
+  }
+  return 1;
+}
+
+// 页码在 URL 中的令牌：HTML 页用独立页号（2026-01），扫描页用位置页码
+const pageToken = (n) => catalogPageLabel(n) || String(n);
 
 /**
  * 全屏放大查看器：
@@ -19,7 +50,7 @@ const clampScale = (s) => Math.min(4, Math.max(0.5, s));
  * - 点内容：fit ↔ 1.6 倍切换；点空白/✕/Esc 关闭
  * - 图片页加载高清原图叠加；HTML 页为矢量内容，任意倍数直接清晰
  */
-function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, label, onClose }) {
+function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, pageLabel, label, onClose }) {
   const { t } = useI18n();
   const [vt, setVt] = useState({ s: 1, x: 0, y: 0 });
   const [fullReady, setFullReady] = useState(false);
@@ -155,7 +186,7 @@ function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, label, onClose }) {
       >
         {htmlId ? (
           <div className="pv-zoom-hp">
-            <CatalogHtmlPage id={htmlId} pageNumber={pageNumber} />
+            <CatalogHtmlPage id={htmlId} pageNumber={pageNumber} label={pageLabel} />
           </div>
         ) : (
           <>
@@ -192,18 +223,20 @@ function PageZoom({ displaySrc, fullSrc, htmlId, pageNumber, label, onClose }) {
 
 /**
  * PDF 画册查看器（跨页版）。
- * - 全端统一视图：01 封面单页，02–37 两两合并（36–37 亦合并），38+ 单页
+ * - 跨页按原书页对：01 封面单页，02–37 相邻原书页两两合并，38+ 单页；HTML 插页恒单页
+ * - URL 锚点：当前页写入 #page-<令牌>（扫描页为位置页码、HTML 页为独立页号如 2026-01），
+ *   也兼容 ?page= 输入；视图模式由 ?view=grid|pdf 参数表达（见 catalog.jsx）
  * - 加载策略：stage 用显示层小图（约 1/6 体积）fetchpriority=high 秒开；
  *   相邻视图显示层待当前加载完再低优先预载，翻页自动取消过期预载；原图仅放大时加载
  * - stage 两侧大翻页按钮；点图片进入全屏放大（不再是翻页）
  */
 export default function PdfViewer({ view, onBack }) {
   const { t } = useI18n();
-  const [page, setPage] = useState(1); // 当前视图首页页码
-  const [numText, setNumText] = useState('1');
+  const [page, setPage] = useState(initialPage); // 当前视图首页页码（可由 ?page= / #page-… 初始化）
+  const [numText, setNumText] = useState(() => pageToken(page));
   const [loaded, setLoaded] = useState({});
   const [started, setStarted] = useState(false);
-  const [zoom, setZoom] = useState(null); // {src, label}
+  const [zoom, setZoom] = useState(null); // {src,label} 或 {htmlId,pageNumber,pageLabel,label}
   const stageRef = useRef(null);
 
   // 视图列表：全端统一跨页（36–37 等两两合并），布局交由 CSS 自适应
@@ -292,20 +325,55 @@ export default function PdfViewer({ view, onBack }) {
     const next = Math.max(0, Math.min(views.length - 1, i));
     const target = views[next];
     setPage(target[0]);
-    setNumText(String(target[0]));
+    setNumText(pageToken(target[0]));
     if (stageRef.current) stageRef.current.scrollTop = 0;
   };
 
-  // 页码输入：跳转到包含该页的视图
+  // 页码输入：跳转到包含该页的视图；支持位置数字（41）与独立页号（2026-01）
   const jumpToPage = (text) => {
-    const n = Math.max(1, Math.min(CATALOG_PAGES, parseInt(text, 10) || 1));
+    const n = resolvePageToken(text);
+    if (n == null) {
+      setNumText(pageToken(page));
+      return;
+    }
     const i = views.findIndex((v) => v.includes(n));
     if (i >= 0) {
       showView(i);
     } else {
-      setNumText(String(page));
+      setNumText(pageToken(page));
     }
   };
+
+  // 页锚点：把当前页写入 URL（#page-…；?view= 由 catalog 管理，?page= 输入被归一为锚点）
+  useEffect(() => {
+    if (view !== 'pdf') return;
+    try {
+      const want = `#page-${pageToken(page)}`;
+      const params = new URLSearchParams(location.search);
+      const hadParam = params.has('page');
+      if (location.hash === want && !hadParam) return;
+      if (hadParam) params.delete('page');
+      const qs = params.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + want);
+    } catch {
+      /* ignore */
+    }
+  }, [view, page]);
+
+  // 页锚点跳转：hash 变为 #page-… 时（外部粘贴/页内链接）切到对应视图
+  useEffect(() => {
+    if (view !== 'pdf') return undefined;
+    const onHash = () => {
+      const m = /^#page-(.+)$/.exec(location.hash);
+      if (!m) return;
+      const n = resolvePageToken(m[1]);
+      if (n == null) return;
+      const i = views.findIndex((v) => v.includes(n));
+      if (i >= 0) showView(i);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, [view, views]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // 首次进入 PDF 模式才开始加载（只加载当前视图，不批量预载）
   useEffect(() => {
@@ -345,23 +413,26 @@ export default function PdfViewer({ view, onBack }) {
         n,
         kind: catalogPageKind(n),
         htmlId: catalogHtmlId(n),
+        pageLabel: catalogPageLabel(n),
         src: catalogDisplaySrc(n),
       }))
     : [];
 
   const openZoom = (item) => {
     if (view !== 'pdf') return;
+    const tok = pageToken(item.n);
     if (item.kind === 'html') {
       setZoom({
         htmlId: item.htmlId,
         pageNumber: item.n,
-        label: `${item.n} / ${CATALOG_PAGES}`,
+        pageLabel: item.pageLabel,
+        label: `${tok} / ${CATALOG_PAGES}`,
       });
     } else {
       setZoom({
         displaySrc: item.src,
         fullSrc: catalogPageSrc(item.n),
-        label: `${item.n} / ${CATALOG_PAGES}`,
+        label: `${tok} / ${CATALOG_PAGES}`,
       });
     }
   };
@@ -384,7 +455,7 @@ export default function PdfViewer({ view, onBack }) {
           <span className="pv-page">
             <input
               type="text"
-              inputMode="numeric"
+              inputMode="text"
               aria-label="page number"
               value={numText}
               onChange={(e) => setNumText(e.target.value)}
@@ -396,7 +467,7 @@ export default function PdfViewer({ view, onBack }) {
                 }
               }}
             />
-            {isSpread && <span className="pv-page-range">–{current[1]}</span>} /{' '}
+            {isSpread && <span className="pv-page-range">–{pageToken(current[1])}</span>} /{' '}
             <b>{CATALOG_PAGES}</b>
           </span>
           <button
@@ -429,23 +500,27 @@ export default function PdfViewer({ view, onBack }) {
           </button>
           <div className={`pv-stage${isSpread ? ' spread' : ''}`} ref={stageRef}>
             {srcs.map((item) => {
-              const { n, kind, htmlId, src } = item;
+              const { n, kind, htmlId, pageLabel, src } = item;
+              // 页锚点：每个页面元素带 id="page-<令牌>"（位置数字或独立页号）
+              const anchor = `page-${pageToken(n)}`;
               if (kind === 'html') {
                 return (
                   <div
                     key={`html-${n}`}
+                    id={anchor}
                     className="pv-html-page"
                     role="img"
-                    aria-label={`产品画册第 ${n} 页`}
+                    aria-label={`产品画册 ${pageToken(n)}`}
                     onClick={() => openZoom(item)}
                   >
-                    <CatalogHtmlPage id={htmlId} pageNumber={n} />
+                    <CatalogHtmlPage id={htmlId} pageNumber={n} label={pageLabel} />
                   </div>
                 );
               }
               return (
                 <img
                   key={src}
+                  id={anchor}
                   alt={`产品画册第 ${n} 页`}
                   src={src}
                   srcSet={`${catalogMidSrc(n)} 952w, ${src} 1488w`}
@@ -480,6 +555,7 @@ export default function PdfViewer({ view, onBack }) {
           fullSrc={zoom.fullSrc}
           htmlId={zoom.htmlId}
           pageNumber={zoom.pageNumber}
+          pageLabel={zoom.pageLabel}
           label={zoom.label}
           onClose={() => setZoom(null)}
         />

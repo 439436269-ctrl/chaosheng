@@ -9,9 +9,12 @@ export function countOf(cat) {
   return PRODUCTS.filter((p) => p.cat === cat).length;
 }
 
-// 视图初始态：默认 PDF 画册展示；URL hash 可强制指定（#grid 进入网页目录）
+// 视图初始态：默认 PDF 画册展示；URL 参数 ?view=grid|pdf 指定（兼容旧链接 #grid/#pdf）
 function initialView() {
   try {
+    const v = new URLSearchParams(location.search).get('view');
+    if (v === 'grid') return 'grid';
+    if (v === 'pdf') return 'pdf';
     if (location.hash === '#grid') return 'grid';
     if (location.hash === '#pdf') return 'pdf';
   } catch {
@@ -27,11 +30,20 @@ export function CatalogProvider({ children }) {
   // 全局视图模式：grid | pdf（导航栏与产品目录共用）
   const [view, setViewState] = useState(initialView);
 
-  // 整页画册形态：body class 与 URL hash 同步
+  // 整页画册形态：body class 与 URL 参数（?view=grid|pdf）同步；旧版 #grid/#pdf 迁移为参数
   useEffect(() => {
     document.body.classList.toggle('pdf-page', view === 'pdf');
     try {
-      history.replaceState(null, '', view === 'pdf' ? '#pdf' : location.pathname + location.search);
+      const params = new URLSearchParams(location.search);
+      params.set('view', view);
+      if (view !== 'pdf') params.delete('page');
+      // 清除旧版视图 hash；切到网页目录时同时清掉页锚点 #page-…。分区锚点（#products 等）保留
+      const legacy = location.hash === '#grid' || location.hash === '#pdf';
+      const pageAnchor = /^#page-/.test(location.hash);
+      let hash = location.hash;
+      if (legacy || (view !== 'pdf' && pageAnchor)) hash = '';
+      const qs = params.toString();
+      history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + hash);
     } catch {
       /* ignore */
     }

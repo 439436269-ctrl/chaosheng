@@ -98,13 +98,14 @@ export const DOCS = [
 // PDF 画册分页：
 // - 基础 41 页为扫描图（assets/docs/catalog/page_NN_{m,d,z}.webp）
 // - EXTRA_CATALOG_PAGES 可插入 HTML 渲染页（数据驱动，便于后续新增/替换内容）：
-//     { kind:'html', id:'new-arrivals', after:40 } → 插在基础第 40 页（紫色汇总页）之后、封底之前
-//     { kind:'image', src:'xxx.jpg', after:39 }    → 插入整图页
+//     { kind:'html', id:'new-arrivals', after:1 } → 插在封面之后（第 2 页）
+//     { kind:'image', src:'xxx.jpg', after:39 }   → 插入整图页
+//   HTML 页使用独立页号 <年份>-<页号>（如 2026-01），与扫描页印刷页码互不干扰
 // - 新增/替换新品：只需在上面的 NEW_ARRIVALS 数组追加条目，
-//   网页「新品推荐」区块与画册第 42 页（HTML 页）会同步生效。
+//   网页「新品推荐」区块与画册中的新品页会同步生效
 export const CATALOG_BASE_PAGES = 41;
 export const EXTRA_CATALOG_PAGES = [
-  { kind: 'html', id: 'new-arrivals', after: 40, title: '2026.09 新产品推荐' },
+  { kind: 'html', id: 'new-arrivals', after: 1, year: 2026, title: '2026.09 新产品推荐' },
 ];
 
 // 分页计划：位置（1 起）→ 内容条目，构建一次
@@ -114,15 +115,24 @@ export const CATALOG_PLAN = (() => {
     (a, b) => (a.after ?? CATALOG_BASE_PAGES) - (b.after ?? CATALOG_BASE_PAGES),
   );
   let next = 1;
+  const seqByYear = {};
   for (const ex of extras) {
     const after = Math.max(0, Math.min(ex.after ?? CATALOG_BASE_PAGES, CATALOG_BASE_PAGES));
     for (let b = next; b <= after; b += 1) plan.push({ kind: 'image', base: b });
     next = after + 1;
-    plan.push(
-      ex.kind === 'html'
-        ? { kind: 'html', id: ex.id, title: ex.title }
-        : { kind: 'image', src: ex.src },
-    );
+    if (ex.kind === 'html') {
+      const year = ex.year ?? 2026;
+      seqByYear[year] = (seqByYear[year] || 0) + 1;
+      plan.push({
+        kind: 'html',
+        id: ex.id,
+        title: ex.title,
+        // 独立页号：<年份>-<该年序号>（可在 EXTRA 中用 pageLabel 覆盖）
+        pageLabel: ex.pageLabel || `${year}-${String(seqByYear[year]).padStart(2, '0')}`,
+      });
+    } else {
+      plan.push({ kind: 'image', src: ex.src });
+    }
   }
   for (let b = next; b <= CATALOG_BASE_PAGES; b += 1) plan.push({ kind: 'image', base: b });
   return plan;
@@ -144,6 +154,12 @@ export function catalogPageKind(n) {
 export function catalogHtmlId(n) {
   const p = planAt(n);
   return p && p.kind === 'html' ? p.id : null;
+}
+
+// HTML 页的独立页号（如 '2026-01'；非 HTML 页返回 null）
+export function catalogPageLabel(n) {
+  const p = planAt(n);
+  return p && p.kind === 'html' ? p.pageLabel || null : null;
 }
 
 function pageSrcFor(n, suffix) {
@@ -169,13 +185,37 @@ export function catalogDisplaySrc(n) {
   return pageSrcFor(n, '_d');
 }
 
-// 跨页规则（2026-10 确认）：01 封面单页，02–37 两两合并，38 之后单页
+// 跨页规则（2026-10 确认）：按原书页对配对——基础页 02–37 两两合并、封面/38+ 单页；
+// 插入的 HTML 页始终单页，且只有相邻的原书页对才合并（被插页隔开则各自单页）
 export function buildSpreadViews() {
-  const spreadEnd = Math.min(37, CATALOG_PAGES);
-  const views = [[1]];
-  for (let p = 2; p + 1 <= spreadEnd; p += 2) views.push([p, p + 1]);
-  for (let p = spreadEnd + 1; p <= CATALOG_PAGES; p++) views.push([p]);
+  const views = [];
+  for (let i = 0; i < CATALOG_PLAN.length; ) {
+    const pos = i + 1;
+    const e = CATALOG_PLAN[i];
+    const nxt = CATALOG_PLAN[i + 1];
+    if (
+      e.kind === 'image' &&
+      e.base >= 2 &&
+      e.base <= 36 &&
+      e.base % 2 === 0 &&
+      nxt &&
+      nxt.kind === 'image' &&
+      nxt.base === e.base + 1
+    ) {
+      views.push([pos, pos + 1]);
+      i += 2;
+    } else {
+      views.push([pos]);
+      i += 1;
+    }
+  }
   return views;
+}
+
+// 按独立页号（如 '2026-01'）查找位置页码；找不到返回 null
+export function findPageByLabel(label) {
+  const i = CATALOG_PLAN.findIndex((p) => p.kind === 'html' && p.pageLabel === label);
+  return i >= 0 ? i + 1 : null;
 }
 
 export const CONTACT = {

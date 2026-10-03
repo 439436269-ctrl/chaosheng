@@ -102,13 +102,15 @@ body.pdf-page .pv-stage .pv-html-page {
   display: block;
 }
 
-/* 联系方式（白粗体，实测原版：字号 ≈2.1cqw、行距 3.36cqw、FAX 列 56.5cqw） */
+/* 联系方式（白粗体，实测原版：字号 ≈2.1cqw、行距 3.36cqw、FAX 列 56.5cqw；两行垂直居中） */
 .chp-tel,
 .chp-fax {
   position: absolute;
   top: 8.67cqw;
   height: 11.56cqw;
-  padding-top: 0.95cqw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   color: #fff;
   font-weight: 700;
   font-size: 2.1cqw;
@@ -250,15 +252,9 @@ body.pdf-page .pv-stage .pv-html-page {
   color: #1e4fa3;
   line-height: 1.4;
 }
-.chp-info-t2 {
-  font-size: 1.2cqw;
-  font-weight: 700;
-  color: #c69031;
-  letter-spacing: 0.06em;
-}
 
 /* 页码块（测量：宽 8.94cqw 高 8.33cqw，顶 66.55cqw，色 #2F318C；
-   印刷偶数页页码在左、奇数页在右，与扫描页一致） */
+   偶数位页码在左、奇数位在右，与扫描页一致） */
 .chp-no {
   position: absolute;
   top: 66.55cqw;
@@ -277,6 +273,12 @@ body.pdf-page .pv-stage .pv-html-page {
 }
 .chp-no-right {
   right: 0;
+}
+/* 独立页号（如 2026-01）：块不越过网格左缘（9.88cqw），字号收窄以完整容纳 */
+.chp-no-label {
+  width: 9.8cqw;
+  font-size: 2.2cqw;
+  letter-spacing: 0.01em;
 }
 
 /* 页脚（测量：top 132.15cqw 高 6.87cqw，渐变 0→79% 淡出为白） */

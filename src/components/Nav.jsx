@@ -43,22 +43,28 @@ export default function Nav() {
               {lang === 'zh' ? 'EN' : '中文'}
             </button>
           </nav>
-          {/* 全局画册切换：任意位置可进入/退出 PDF 画册 */}
+          {/* 全局画册切换：真链接（?view=grid|pdf），可复制/新标签打开；点击时阻止默认跳转保持 SPA */}
           <div className="view-switch nav-vs">
-            <button
-              type="button"
+            <a
+              href="?view=grid"
               className={`vs-btn${view === 'grid' ? ' on' : ''}`}
-              onClick={() => setView('grid')}
+              onClick={(e) => {
+                e.preventDefault();
+                setView('grid');
+              }}
             >
               {t('view.grid')}
-            </button>
-            <button
-              type="button"
+            </a>
+            <a
+              href="?view=pdf"
               className={`vs-btn${view === 'pdf' ? ' on' : ''}`}
-              onClick={() => setView('pdf')}
+              onClick={(e) => {
+                e.preventDefault();
+                setView('pdf');
+              }}
             >
               {t('view.pdf')}
-            </button>
+            </a>
           </div>
           <button
             type="button"

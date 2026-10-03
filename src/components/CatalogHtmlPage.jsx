@@ -4,14 +4,14 @@ import { CONTACT, NEW_ARRIVALS } from '../data/site.js';
 // 注册表：id → 组件；site.js 的 EXTRA_CATALOG_PAGES 中 { kind:'html', id } 引用此处 id
 // 新增/替换新品只需改 site.js 的 NEW_ARRIVALS 数组，网页「新品推荐」区块与本页同步生效
 // （缩略图约定：与原图同目录的 <原名>_t.webp；缺失时自动回退原图）
+// 页码块使用独立页号 label（如 2026-01），不占扫描书的印刷页码序列
 
 const thumb = (img) => img.replace(/\.jpe?g$/i, '_t.webp');
 
-/** 新产品推荐页（插在紫色汇总页之后、封底之前） */
-function NewArrivalsPage({ pageNumber }) {
-  // 扫描画册印刷页码 = 文件页码 - 2；印刷奇数页页码在右、偶数在左（与扫描页一致）
-  const printed = pageNumber - 2;
-  const side = printed % 2 === 1 ? 'right' : 'left';
+/** 新产品推荐页（插在封面之后，第 2 页） */
+function NewArrivalsPage({ pageNumber, label }) {
+  // 边侧与扫描页同规则：偶数位在左、奇数位在右（位置 2 → 左）
+  const side = pageNumber % 2 === 0 ? 'left' : 'right';
 
   const cells = NEW_ARRIVALS.map((s) => (
     <div className="chp-cell" key={s.code}>
@@ -47,8 +47,6 @@ function NewArrivalsPage({ pageNumber }) {
         TEL: {CONTACT.tel}
         <br />
         M.T: {CONTACT.mobile}
-        <br />
-        https://csfzpj.1688.com
       </div>
       <div className="chp-fax">
         FAX: {CONTACT.fax}
@@ -73,11 +71,10 @@ function NewArrivalsPage({ pageNumber }) {
             <br />
             扫码查看
           </span>
-          <span className="chp-info-t2">csfzpj.1688.com</span>
         </div>
       </div>
 
-      <div className={`chp-no chp-no-${side}`}>{printed}</div>
+      <div className={`chp-no chp-no-${side} chp-no-label`}>{label || pageNumber}</div>
 
       <footer className="chp-foot">
         <span>ADD: {CONTACT.addrZh}</span>
@@ -93,10 +90,11 @@ const HTML_PAGES = {
 /**
  * 画册 HTML 页入口。
  * id：site.js EXTRA_CATALOG_PAGES 中登记的组件 id
- * pageNumber：该页在画册中的位置页码（1 起）
+ * pageNumber：该页在画册中的位置页码（1 起，决定页码块左/右侧）
+ * label：独立页号（如 '2026-01'），显示在页码块中
  */
-export default function CatalogHtmlPage({ id, pageNumber }) {
+export default function CatalogHtmlPage({ id, pageNumber, label }) {
   const Page = HTML_PAGES[id];
   if (!Page) return null;
-  return <Page pageNumber={pageNumber} />;
+  return <Page pageNumber={pageNumber} label={label} />;
 }
